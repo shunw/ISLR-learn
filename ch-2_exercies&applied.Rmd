@@ -1,0 +1,66 @@
+---
+title: "ch-2_exercises&applied"
+author: "wendy"
+date: "April 4, 2016"
+output: html_document
+---
+
+1. Describe the null hypotheses to which the p-values given in Table 3.4 correspond. Explain what conclusions you can draw based on these p-values. Your explanation should be phrased in terms of sales, TV, radio, and newspaper, rather than in terms of the coefficients of the linear model.
+
+TV and radio are the significant predictor to the ads effect. 
+Newspaper is not a significant predictor. 
+--- refer to answers in the github, which is much better than mine. 
+
+2. Carefully explain the differences between the KNN classifier and KNN regression methods.
+
+both is to set a K and then get the result.
+KNN regression is to calculate the parametric with the closest K data. 
+KNN classifier is to get the result according to the higher percentage.
+
+3. Suppose we have a data set with five predictors, X1 = GPA, X2 = IQ, X3 = Gender (1 for Female and 0 for Male), X4 = Interaction between GPA and IQ, and X5 = Interaction between GPA and Gender. The response is starting salary after graduation (in thousands of dollars). Suppose we use least squares to fit the model, and get βˆ0 = 50, βˆ1 = 2 0 , βˆ 2 = 0 . 0 7 , βˆ 3 = 3 5 , βˆ 4 = 0 . 0 1 , βˆ 5 =  -10
+
+(a) Which answer is correct, and why? iv is correct
+---> ans should be iii
+i. For a fixed value of IQ and GPA, males earn more on average than females. 
+ii. For a fixed value of IQ and GPA, females earn more on average than males. 
+iii. For a fixed value of IQ and GPA,males earn more on average than females provided that the GPA is high enough.
+iv. For a fixed value of IQ and GPA, females earn more on average than males provided that the GPA is high enough.
+
+(b) Predict the salary of a female with IQ of 110 and a GPA of 4.0.
+50 + 20*4 + .07*110 + 35*1 + .01*(110*4) - 10*(4*1)
+
+(c) True or false: Since the coefficient for the GPA/IQ interaction term is very small, there is very little evidence of an interaction effect. Justify your answer.
+evidence is to check the p value. P value could show if this effect is significant or not. 
+coeffiecient is small is just their effect in the formular. 
+
+4. 
+a. the training RSS of the cubic regression would smaller than linear one, due to the overfitting
+b. the test RSS of the cubic regression would higher than the linear one. 
+c. the cubic regression's RSS should be smaller
+d. hard to say depending on how the real relationship between X and Y
+
+8. 
+```
+Auto.lm = lm(mpg~horsepower, data = Auto)
+summary(Auto.lm)
+predict(Auto.lm, data.frame(horsepower = c(98)), interval = "confidence")
+predict(Auto.lm, data.frame(horsepower = c(98)), interval = "prediction")
+```
+i. yes, there is a relationship between the predictor and the response. 
+ii. strong, the adjusted R-squared is .6049, t value is -24.5. 
+iii. the relationship is negative
+iv. ???? why different than the ans
+result is 40-.15*98 = 25.3
+95% confidence 40+(-.15+2*.006)*98 = 26.476
+95% confidence 40+(-.15-2*.006)*98 = 24.124
+
+
+```{r}
+summary(cars)
+```
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+plot(cars)
+```

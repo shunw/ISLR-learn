@@ -35,3 +35,4 @@ vignettes/*.pdf
 *.mp4
 *.pdf
 *.srt
+.DS_Store
