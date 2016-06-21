@@ -149,7 +149,7 @@ head(Caravan)
 dim(Caravan)
 summary(Caravan$Purchase)
 
-#standarize the data by making the mean = 0 and the deviation = 1
+##standarize the data by making the mean = 0 and the deviation = 1
 standardized.X = scale(Caravan[, -86])
 var(Caravan[, 1])
 var(Caravan[, 2])
@@ -165,3 +165,24 @@ label.test.X = Caravan$Purchase[!train.index]
 set.seed(1)
 pre.knn = knn(train.X, test.X, label.train.X, k = 1)
 mean(pre.knn != "No")
+
+pre.knn = knn(train.X, test.X, label.train.X, k = 3)
+table(pre.knn, label.test.X)
+25/(96+25)
+
+## analysis with logstic regression. 
+test = 1:1000
+train.X = standardized.X[-test, ]
+test.X = standardized.X[test, ]
+train.Y = Caravan$Purchase[-test]
+test.Y = Caravan$Purchase[test]
+
+lm.caravan.glm = glm(Purchase ~ ., data = Caravan, family = "binomial", subset = -test)
+probs.caravan.glm = predict(lm.caravan.glm, Caravan[test, ], type = "response")
+length(test)
+pre.glm = rep("No", 1000)
+pre.glm[probs.caravan.glm > .5] = "Yes"
+table(pre.glm, test.Y)
+
+pre.glm[probs.caravan.glm > .25] = "Yes"
+table(pre.glm, test.Y)
