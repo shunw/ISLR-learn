@@ -12,7 +12,7 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 for which (4.12) is largest is equivalent to classifying an observation
 to the class for which (4.13) is largest. Prove that this is the case. In
 other words, under the assumption that the observations in the kth
-class are drawn from a N(??k, ??2) distribution, the Bayes' classifier
+class are drawn from a N(μk, σ2) distribution, the Bayes’ classifier
 assigns an observation to the class for which the discriminant function
 is maximized.
 
@@ -23,27 +23,66 @@ is maximized.
 ###page 185
 10 This question should be answered using the Weekly data set, which
 is part of the ISLR package. This data is similar in nature to the
-Smarket data from this chapter's lab, except that it contains 1, 089
+Smarket data from this chapter’s lab, except that it contains 1, 089
 weekly returns for 21 years, from the beginning of 1990 to the end of
 2010.
 
 (a) Produce some numerical and graphical summaries of the Weekly
 data. Do there appear to be any patterns?
 
-
+-- from the pairs, we could see the (year and volume), (today and direction) have strong relationship, maybe the (volume and today) has some relationship. 
 ```{r}
 install.packages("ISLR")
 library(ISLR)
 head(Weekly)
 dim(Weekly)
-
+```
+```{r, echo=FALSE}
+pairs(Weekly)
 plot(Weekly$Volume ~ Weekly$Year)
 ```
 
+(b) Use the full data set to perform a logistic regression with
+Direction as the response and the five lag variables plus Volume
+as predictors. Use the summary function to print the results. Do
+any of the predictors appear to be statistically significant? If so,
+which ones?
 
-from the pairs, we could see the (year and volume), (today and direction) have strong relationship, maybe the (volume and today) has some relationship. 
-```{r, echo=FALSE}
-pairs(Weekly)
+-- Lag2 shows the statistically significant.  
+```{r}
+names(Weekly)
+weekly.fit = glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, data = Weekly, family = "binomial")
+summary(weekly.fit)
 ```
 
+(c) Compute the confusion matrix and overall fraction of correct predictions. Explain what the confusion matrix is telling you about the types of mistakes made by logistic regression.
+
+-- the correct rate is around 56%, which should be lower if apply the regression into the actual condition. 
+```{r}
+weekly.pre = predict(weekly.fit, Weekly, type = "response")
+weekly.res = rep("Down", length(weekly.pre))
+weekly.res[weekly.pre > .5] = "Up"
+direction.label = Weekly$Direction
+contrasts(Weekly$Direction)
+table(weekly.res, direction.label)
+mean(weekly.res == direction.label)
+557/(557+430)
+54/(54+48)
+```
+
+(d) Now fit the logistic regression model using a training data period from 1990 to 2008, with Lag2 as the only predictor. Compute the confusion matrix and the overall fraction of correct predictions for the held out data (that is, the data from 2009 and 2010).
+
+--the error rate is similar as the (c) part, which also shows that only with Lag2 also could make the similar prediction. 
+```{r}
+weekly.train = Weekly[which(Weekly$Year>=1990 & Weekly$Year<=2008), ]
+weekly.test = Weekly[which(Weekly$Year<1990 | Weekly$Year>2008),]
+weekly.glm_1 = glm(Direction ~ Lag2, data = weekly.train, family = "binomial")
+weekly.pre_1 = predict(weekly.glm_1, Weekly, type = "response")
+weekly.res_1 = rep("Down", length(weekly.pre_1))
+weekly.res_1[weekly.pre_1>.5] = "Up"
+table(weekly.res_1, direction.label)
+mean(weekly.res_1 == direction.label)
+580/(452+580)
+32/(32+25)
+```
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
