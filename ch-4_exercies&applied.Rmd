@@ -1,0 +1,49 @@
+---
+title: "ch4-exercise"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+#exercises. 
+###page 182 to 184. skipped for next time. 
+
+2. It was stated in the text that classifying an observation to the class
+for which (4.12) is largest is equivalent to classifying an observation
+to the class for which (4.13) is largest. Prove that this is the case. In
+other words, under the assumption that the observations in the kth
+class are drawn from a N(??k, ??2) distribution, the Bayes' classifier
+assigns an observation to the class for which the discriminant function
+is maximized.
+
+--- not sure how to demonstrate this. 
+
+
+#Applied
+###page 185
+10 This question should be answered using the Weekly data set, which
+is part of the ISLR package. This data is similar in nature to the
+Smarket data from this chapter's lab, except that it contains 1, 089
+weekly returns for 21 years, from the beginning of 1990 to the end of
+2010.
+
+(a) Produce some numerical and graphical summaries of the Weekly
+data. Do there appear to be any patterns?
+
+
+```{r}
+install.packages("ISLR")
+library(ISLR)
+head(Weekly)
+dim(Weekly)
+
+plot(Weekly$Volume ~ Weekly$Year)
+```
+
+
+from the pairs, we could see the (year and volume), (today and direction) have strong relationship, maybe the (volume and today) has some relationship. 
+```{r, echo=FALSE}
+pairs(Weekly)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
