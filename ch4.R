@@ -177,6 +177,9 @@ test.X = standardized.X[test, ]
 train.Y = Caravan$Purchase[-test]
 test.Y = Caravan$Purchase[test]
 
+nrow(train.X)
+nrow(test.X)
+
 lm.caravan.glm = glm(Purchase ~ ., data = Caravan, family = "binomial", subset = -test)
 probs.caravan.glm = predict(lm.caravan.glm, Caravan[test, ], type = "response")
 length(test)

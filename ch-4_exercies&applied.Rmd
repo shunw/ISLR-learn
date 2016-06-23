@@ -85,4 +85,68 @@ mean(weekly.res_1 == direction.label)
 580/(452+580)
 32/(32+25)
 ```
+
+--result is almost the same a the glm result according to the table result. 
+(e) Repeat (d) using LDA.
+```{r}
+library(MASS)
+weekly.lda = lda(Direction ~ Lag2, data = weekly.train)
+weekly.lda.pre = predict(weekly.lda, Weekly, type = "response")
+table(weekly.lda.pre$class, direction.label)
+mean(weekly.lda.pre$class == direction.label)
+```
+
+(f) Repeat (d) using QDA.
+-- the result is different than the lda and glm, there is no "down" estimation. it seems the regression is linear not suitable for the quadratic regression. 
+```{r}
+weekly.qda = qda(Direction ~ Lag2, data = weekly.train)
+weekly.qda.per = predict(weekly.qda, Weekly, type = "response")
+table(weekly.qda.per$class, direction.label)
+mean(weekly.qda.per$class == direction.label)
+```
+
+(g) Repeat (d) using KNN with K = 1.
+-- the error rate is much lower than all the regression before. So I guess the regression is neither linear nor quadratic. which is much like un-regular one. 
+Checked error rate by increasing k. higher k leads to higher error rate. 
+```{r}
+train.X = cbind(weekly.train$Lag2)
+test.X = cbind(Weekly$Lag2)
+train.direction = weekly.train$Direction
+test.direction = Weekly$Direction
+
+library(class)
+# for k = 1
+weekly.knn = knn(train.X, test.X, train.direction, k = 1)
+table(weekly.knn, test.direction)
+mean(weekly.knn == test.direction)
+
+# for k = 5
+weekly.knn = knn(train.X, test.X, train.direction, k = 5)
+table(weekly.knn, test.direction)
+mean(weekly.knn == test.direction)
+
+# for k = 10
+weekly.knn = knn(train.X, test.X, train.direction, k = 10)
+table(weekly.knn, test.direction)
+mean(weekly.knn == test.direction)
+
+plot(Weekly$Lag2 ~ Weekly$Year)
+```
+
+(h) Which of these methods appears to provide the best results on this data?
+-- it seems the knn provides the best result on the data. 
+
+(i) Experiment with different combinations of predictors, including possible transformations and interactions, for each of the methods. Report the variables, method, and associated confusion matrix that appears to provide the best results on the held out data. Note that you should also experiment with values for K in the KNN classifier.
+
+-- checked by adding other predictors, but the p value is not significant for other predictors. And also trying the interact with Year/ Volume/ etc, but the interactions are also not significant. It seems only Lag1 and Lag2 are most significant. Need to check the answers and see if there is any other methods other than try one by one. 
+
+?? need to check the transformation for the next step. 
+```{r}
+weekly.glm.try = glm(Direction ~ Lag1 + Volume * Today, data = weekly.train, family = "binomial")
+summary(weekly.glm.try)
+```
+
+
+
+
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
