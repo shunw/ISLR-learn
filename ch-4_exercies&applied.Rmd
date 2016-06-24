@@ -180,6 +180,10 @@ boxplot(acceleration ~ mpg01, data = Auto_mpg)
 ```
 
 (c) Split the data into a training set and a test set.
+```{r}
+dim(Auto)
+train_index = sample(c(TRUE, FALSE), size = nrow(Auto_mpg), replace = TRUE, prob = c(.8, .2))
+```
 
 (d) Perform LDA on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in  (b). What is the test error of the model obtained?
 
