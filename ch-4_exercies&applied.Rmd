@@ -40,6 +40,7 @@ dim(Weekly)
 ```{r, echo=FALSE}
 pairs(Weekly)
 plot(Weekly$Volume ~ Weekly$Year)
+plot(Weekly$Today ~ Weekly$Direction)
 ```
 
 (b) Use the full data set to perform a logistic regression with
@@ -140,13 +141,53 @@ plot(Weekly$Lag2 ~ Weekly$Year)
 
 -- checked by adding other predictors, but the p value is not significant for other predictors. And also trying the interact with Year/ Volume/ etc, but the interactions are also not significant. It seems only Lag1 and Lag2 are most significant. Need to check the answers and see if there is any other methods other than try one by one. 
 
-?? need to check the transformation for the next step. 
+-- as for the transformation, I log the Volume, but still not significant. I suspect this due to the pair chart, and the shape between the Volume and the Direction seems have the log shape. 
 ```{r}
 weekly.glm.try = glm(Direction ~ Lag1 + Volume * Today, data = weekly.train, family = "binomial")
 summary(weekly.glm.try)
 ```
+```{r}
+weekly.glm.try = glm(Direction ~ exp(Volume), data = weekly.train, family = "binomial")
+summary(weekly.glm.try)
+```
 
 
+11. In this problem, you will develop a model to predict whether a given car gets high or low gas mileage based on the Auto data set.
+
+(a) Create a binary variable, mpg01, that contains a 1 if mpg contains a value above its median, and a 0 if mpg contains a value below its median. You can compute the median using the median() function. Note you may find it helpful to use the data.frame() function to create a single data set containing both mpg01 and
+the other Auto variables.
+
+--done as below, but guess there should be some more convenience way to create this. 
+```{r}
+head(Auto)
+Auto_mpg = Auto
+mpg01 = rep(0, nrow(Auto))
+Auto_mpg = cbind(Auto_mpg, mpg01)
+avg_mpg = median(Auto_mpg$mpg)
+Auto_mpg[which(Auto_mpg$mpg > avg_mpg), "mpg01"] =1
+```
+
+(b) Explore the data graphically in order to investigate the association between mpg01 and the other features. Which of the other features seem most likely to be useful in predicting mpg01? Scatterplots and boxplots may be useful tools to answer this question. Describe your findings.
+
+-- according to the pairs plot, it seems mpg/ horsepower/ weight/ acceleration/ could helpful to predict the mpg01. 
+-- after checking in the boxplot, found acceleration is not as obvious as others. So, the element would impact the mpg prediction would be mpg/ horsepower/ weight. 
+```{r}
+pairs(Auto_mpg)
+boxplot( weight ~ mpg01, data = Auto_mpg)
+boxplot(horsepower ~ mpg01, data = Auto_mpg)
+boxplot(mpg ~ mpg01, data = Auto_mpg)
+boxplot(acceleration ~ mpg01, data = Auto_mpg)
+```
+
+(c) Split the data into a training set and a test set.
+
+(d) Perform LDA on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in  (b). What is the test error of the model obtained?
+
+(e) Perform QDA on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?
+
+(f) Perform logistic regression on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?
+
+(g) Perform KNN on the training data, with several values of K, in order to predict mpg01. Use only the variables that seemed most associated with mpg01 in (b). What test errors do you obtain? Which value of K seems to perform the best on this data set?
 
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
