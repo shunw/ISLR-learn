@@ -23,7 +23,7 @@ is maximized.
 ###page 185
 10 This question should be answered using the Weekly data set, which
 is part of the ISLR package. This data is similar in nature to the
-Smarket data from this chapter’s lab, except that it contains 1, 089
+Smarket data from this chapter's lab, except that it contains 1, 089
 weekly returns for 21 years, from the beginning of 1990 to the end of
 2010.
 
@@ -173,7 +173,7 @@ Auto_mpg[which(Auto_mpg$mpg > avg_mpg), "mpg01"] =1
 -- after checking in the boxplot, found acceleration is not as obvious as others. So, the element would impact the mpg prediction would be mpg/ horsepower/ weight. 
 ```{r}
 pairs(Auto_mpg)
-boxplot( weight ~ mpg01, data = Auto_mpg)
+boxplot(weight ~ mpg01, data = Auto_mpg)
 boxplot(horsepower ~ mpg01, data = Auto_mpg)
 boxplot(mpg ~ mpg01, data = Auto_mpg)
 boxplot(acceleration ~ mpg01, data = Auto_mpg)
@@ -181,17 +181,66 @@ boxplot(acceleration ~ mpg01, data = Auto_mpg)
 
 (c) Split the data into a training set and a test set.
 ```{r}
+library(ISLR)
 dim(Auto)
 train_index = sample(c(TRUE, FALSE), size = nrow(Auto_mpg), replace = TRUE, prob = c(.8, .2))
+Auto_train = Auto_mpg[train_index, ]
+Auto_test = Auto_mpg[!train_index, ]
 ```
 
 (d) Perform LDA on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in  (b). What is the test error of the model obtained?
 
+--with mpg, the error rate is 97.4%, but I don't think that is correct, due to only mpg could estimate the mpg01. 
+--without mpg, the error rate is 87%. 
+```{r}
+library(MASS)
+Auto_lda = lda(mpg01 ~ horsepower + weight + acceleration, data = Auto_train)
+Auto_lda_predict = predict(Auto_lda, Auto_test, response = "class")
+Auto_lda_pre_class = Auto_lda_predict$class
+mean(Auto_lda_pre_class == Auto_test$mpg01)
+table(Auto_lda_pre_class, Auto_test$mpg01)
+```
+
+
 (e) Perform QDA on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?
+
+-- the test error of the qda is 85.7%, a little lower than lda. 
+```{r}
+Auto_qda = qda(mpg01 ~ horsepower + weight + acceleration, data = Auto_train)
+Auto_qda_pre = predict(Auto_qda, Auto_test)
+Auto_qda_pre_label = Auto_qda_pre$class
+mean(Auto_qda_pre_label == Auto_test$mpg01)
+table(Auto_qda_pre_label, Auto_test$mpg01)
+```
 
 (f) Perform logistic regression on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?
 
+-- the test error rate is 87%, which is similar to the lda, but the to TrueTrue and TrueFalse, the rate is different. 
+```{r}
+Auto_glm = glm(mpg01 ~ horsepower + weight + acceleration, data = Auto_train, family = "binomial")
+Auto_glm_pre = predict(Auto_glm, Auto_test, type = "response")
+Auto_glm_pre_label = rep(0, nrow(Auto_test))
+Auto_glm_pre_label[which(Auto_glm_pre >.5)] = 1
+
+table(Auto_glm_pre_label, Auto_test$mpg01)
+mean(Auto_glm_pre_label == Auto_test$mpg01)
+```
+
 (g) Perform KNN on the training data, with several values of K, in order to predict mpg01. Use only the variables that seemed most associated with mpg01 in (b). What test errors do you obtain? Which value of K seems to perform the best on this data set?
 
+-- k = 1, 84.4%; k = 5 87%; k = 10, 88.3%; k = 50, 84.4%;
+-- seem around k = 20 to 30 is almost the peak of the error rate. 
+```{r}
+dim(Auto_train)
+Auto_train.X = cbind(Auto_train$horsepower, Auto_train$weight, Auto_train$acceleration)
+Auto_test.X = cbind(Auto_test$horsepower, Auto_test$weight, Auto_test$acceleration)
+nrow(Auto_test.X)
+Auto_train.label = Auto_train$mpg01
+Auto_test.label = Auto_test$mpg01
+library(class)
+Auto_knn_pre = knn(Auto_train.X, Auto_test.X, Auto_train.label, k = 30)
+mean(Auto_knn_pre == Auto_test.label)
+table(Auto_knn_pre, Auto_test.label)
+```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
