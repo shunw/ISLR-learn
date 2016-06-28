@@ -316,6 +316,7 @@ PlotPower(1:10, 3)
 
 
 ```{r}
+library(MASS)
 #this is to add crim data into the Boston data
 Boston_crim <- Boston
 crim_mean <- median(Boston$crim)
@@ -329,14 +330,83 @@ pairs(Boston_crim)
 
 -- use pairs to check the data. some data has the unusual shape like:
 ![special_shape](C:\Users\lishunw.AUTH\My Work\program\github\ISLR-learn\photo_insert\special_shape.png)
-the special ones are: zn, indus, chas, rad, tax, ptratio, 
-the elemnets related with crim: medv, dis, age
-analyze as below: 
 
+-- after checking with the boxplot, found "chas" seems not differentiate with the 0, 1 as other special shape. 
+
+-- the special ones are: zn, indus, rad, tax, ptratio, 
 ```{r}
 boxplot(zn ~ crim01, data = Boston_crim)
 head(Boston_crim)
-?Boston
+
+boxplot(indus ~ crim01, data = Boston_crim)
+
+boxplot(rad ~ crim01, data = Boston_crim)
+
+boxplot(tax ~ crim01, data = Boston_crim)
+
+boxplot(ptratio ~ crim01, data = Boston_crim)
+```
+
+-- the elemnets related with crim: medv, dis, age
+```{r}
+plot(crim ~ medv, data = Boston_crim)
+plot(crim ~ dis, data = Boston_crim)
+plot(crim ~ age, data = Boston_crim)
+```
+
+-- check the glm regression method. When regression versus all the predictors, according to the coef's p value, all the predictors are not significant. However, if only adding the predicts seems significant, judged from the paired/ boxplot, the regression's coef p value would change to significant. And from the regression, "boston_glm_0", only the zn, rad, age are siginficant. 
+
+-- the correct rate is 85.9% with glm regression. 
+```{r}
+boston_glm_all = glm(crim01 ~ ., data = Boston_crim, family = "binomial")
+boston_glm_0 = glm(crim01 ~ zn + indus + rad + tax + ptratio + medv + dis + age, data = Boston_crim, family = "binomial")
+
+boston_train_index = sample(c(TRUE, FALSE), size = nrow(Boston_crim), replace = TRUE, prob = c(.8, .2))
+
+boston_train = Boston_crim[boston_train_index, ]
+boston_test = Boston_crim[!boston_train_index,]
+
+boston_glm_1 = glm(crim01 ~ zn + rad + age, data = Boston_crim, family = "binomial")
+boston_glm_pre = predict(boston_glm_1, boston_test, type = "response")
+
+boston_glm_label = rep(0, nrow(boston_test))
+boston_glm_label[which(boston_glm_pre > .5)] = 1
+
+boston_test_label = boston_test$crim01
+
+mean(boston_glm_label == boston_test_label)
+table(boston_glm_label, boston_test_label)
+```
+
+--correct rate with lda is 84.7%
+```{r}
+boston_lda = lda(crim01 ~ zn + rad + age, data = Boston_crim)
+boston_lda_pre = predict(boston_lda, boston_test)
+boston_lda_label = (boston_lda_pre)$class
+
+mean(boston_lda_label == boston_test_label)
+table(boston_lda_label, boston_test_label)
+```
+
+-- check with knn functions. 
+-- k = 1, the correct rate is 80%; k = 5, the correct rate is 84.7%; k = 10, the correct rate is 83.5%. So the knn's k should be between 5 and 10 to reach the peak of the correct rate. 
+```{r}
+boston_train.X = cbind(boston_train$zn, boston_train$rad, boston_train$age)
+boston_test.X = cbind(boston_test$zn, boston_test$rad, boston_test$age)
+boston_train_label = boston_train$crim01
+library(class)
+boston_knn = knn(boston_train.X, boston_test.X, boston_train_label, k = 1)
+mean(boston_knn == boston_test_label)
+table(boston_knn, boston_test_label)
+
+boston_knn = knn(boston_train.X, boston_test.X, boston_train_label, k = 5)
+mean(boston_knn == boston_test_label)
+table(boston_knn, boston_test_label)
+
+boston_knn = knn(boston_train.X, boston_test.X, boston_train_label, k = 10)
+mean(boston_knn == boston_test_label)
+table(boston_knn, boston_test_label)
+
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
