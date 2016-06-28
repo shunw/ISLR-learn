@@ -1,0 +1,12 @@
+---
+title: "Questions"
+author: "Wendy"
+date: "June 28, 2016"
+output: html_document
+---
+
+#Question 1
+Two/ Three predictors, two rows of data, after calculate with lm function, only one predictor has coef, the other one/ two's coef is NA. 
+WHY?
+
+-- guess this is depend on how many data you have. If you have two row of data, only one predictor's coef would be fixed. But if you have more, then more predictors' coef could be made. 

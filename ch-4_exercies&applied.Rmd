@@ -12,7 +12,7 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 for which (4.12) is largest is equivalent to classifying an observation
 to the class for which (4.13) is largest. Prove that this is the case. In
 other words, under the assumption that the observations in the kth
-class are drawn from a N(μk, σ2) distribution, the Bayes’ classifier
+class are drawn from a N(k,2) distribution, the Bayes classifier
 assigns an observation to the class for which the discriminant function
 is maximized.
 
@@ -32,7 +32,6 @@ data. Do there appear to be any patterns?
 
 -- from the pairs, we could see the (year and volume), (today and direction) have strong relationship, maybe the (volume and today) has some relationship. 
 ```{r}
-install.packages("ISLR")
 library(ISLR)
 head(Weekly)
 dim(Weekly)
@@ -317,12 +316,27 @@ PlotPower(1:10, 3)
 
 
 ```{r}
-#this is to 
+#this is to add crim data into the Boston data
 Boston_crim <- Boston
 crim_mean <- median(Boston$crim)
 crim01 <- rep(0, nrow(Boston))
 Boston_crim <- cbind(Boston, crim01)
 Boston_crim[which(Boston_crim$crim > crim_mean), "crim01"] = 1
+
+#get the rough info from the data
+pairs(Boston_crim)
+```
+
+-- use pairs to check the data. some data has the unusual shape like:
+![special_shape](C:\Users\lishunw.AUTH\My Work\program\github\ISLR-learn\photo_insert\special_shape.png)
+the special ones are: zn, indus, chas, rad, tax, ptratio, 
+the elemnets related with crim: medv, dis, age
+analyze as below: 
+
+```{r}
+boxplot(zn ~ crim01, data = Boston_crim)
+head(Boston_crim)
+?Boston
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
