@@ -1,0 +1,39 @@
+---
+title: "ch-5_reading_note"
+author: "Wendy"
+date: "June 29, 2016"
+output: html_document
+---
+
+| Type | --- |
+| --- | --- |
+| Cross-Validation | --- |
+| --- | --- |
+
+
+###Cross-Validation
+####from page 190
+
+**example @ 5.1.1**
+*purpose:* to check which regression function is better  
+*method:* to make split the dataset into two part.   
+
+<span style="color:orange">STOPPED HERE</span>  
+<span style="color:red">DON'T KNOW HOW TO MAKE CALCULATION THE ERROR RATE IN THE QUANTITY REGRESSION.</span>
+
+```{r}
+library(ISLR)
+Auto.lm1 = lm(mpg ~ horsepower, data = Auto)
+Auto.lm2 = lm(mpg ~ poly(horsepower, 2), data = Auto)
+
+train_index = sample(c(TRUE, FALSE), size = nrow(Auto), replace = TRUE, prob = c(.5, .5))
+
+Auto.lm1 = lm(mpg ~ horsepower, data = Auto, subset = train_index)
+Auto.lm2 = lm(mpg ~ poly(horsepower, 2), data = Auto, subset = train_index)
+Auto.lm1.pre = predict(Auto.lm1, Auto[!train_index, ])
+test = Auto[!train_index, "mpg"] - Auto.lm1.pre
+Auto.lm2.pre = predict(Auto.lm2, Auto[!train_index, ])
+
+
+```
+
