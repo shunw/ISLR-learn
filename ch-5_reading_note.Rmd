@@ -12,28 +12,33 @@ output: html_document
 
 
 ###Cross-Validation
-####from page 190
+####from page 190 lab from 205 
 
 **example @ 5.1.1**
 *purpose:* to check which regression function is better  
 *method:* to make split the dataset into two part.   
-
-<span style="color:orange">STOPPED HERE</span>  
-<span style="color:red">DON'T KNOW HOW TO MAKE CALCULATION THE ERROR RATE IN THE QUANTITY REGRESSION.</span>
-
+*result:* the poly(horsepower, 2) show more lower error rate. 
+__NEXT STEP: make page 178 charts --> is anyway to make a function for it. __
 ```{r}
 library(ISLR)
-Auto.lm1 = lm(mpg ~ horsepower, data = Auto)
-Auto.lm2 = lm(mpg ~ poly(horsepower, 2), data = Auto)
+set.seed(1)
 
+summary(Auto.lm1)
 train_index = sample(c(TRUE, FALSE), size = nrow(Auto), replace = TRUE, prob = c(.5, .5))
 
+
 Auto.lm1 = lm(mpg ~ horsepower, data = Auto, subset = train_index)
-Auto.lm2 = lm(mpg ~ poly(horsepower, 2), data = Auto, subset = train_index)
 Auto.lm1.pre = predict(Auto.lm1, Auto[!train_index, ])
-test = Auto[!train_index, "mpg"] - Auto.lm1.pre
+test_error <- mean((Auto[!train_index, "mpg"] - Auto.lm1.pre) ^ 2)
+poly_num <- 1
+
+Auto.lm2 = lm(mpg ~ poly(horsepower, 2), data = Auto, subset = train_index)
 Auto.lm2.pre = predict(Auto.lm2, Auto[!train_index, ])
+test_error[length(test_error)+1] <- mean((Auto[!train_index, "mpg"] - Auto.lm2.pre)^2)
+poly_num[length(poly_num)+1] <- 2
 
 
 ```
 
+note to color the work in the HTML
+<span style="color:orange"> xxx </span>  
