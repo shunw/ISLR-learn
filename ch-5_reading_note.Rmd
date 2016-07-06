@@ -18,26 +18,52 @@ output: html_document
 *purpose:* to check which regression function is better  
 *method:* to make split the dataset into two part.   
 *result:* the poly(horsepower, 2) show more lower error rate. 
-__NEXT STEP: make page 178 charts --> is anyway to make a function for it. __
+__NEXT STEP: make page 192 charts --> is anyway to make a function for it. __
 ```{r}
 library(ISLR)
 set.seed(1)
-
-summary(Auto.lm1)
+set.seed(2)
 train_index = sample(c(TRUE, FALSE), size = nrow(Auto), replace = TRUE, prob = c(.5, .5))
 
+# make the plot for n = 1:10 error rate with same train_index
+make_poly_1st <- function(n, train_index){
+  temp.test_error <- NULL
+  poly_num <- NULL
+  
+  for (i in 1:n) {
+    temp.lm = lm(mpg ~ poly(horsepower, i), data = Auto, subset = train_index)
+    temp.lm.pre = predict(temp.lm, Auto[!train_index, ])
+    temp.test_error <- c(temp.test_error, mean((Auto[!train_index, "mpg"] - temp.lm.pre)^2))
+    poly_num <- c(poly_num, i)
+    
+  }
+  
+  poly_test_err <- data.frame("poly" = poly_num, "test_err" = temp.test_error)
+  return (poly_test_err)
+}
 
-Auto.lm1 = lm(mpg ~ horsepower, data = Auto, subset = train_index)
-Auto.lm1.pre = predict(Auto.lm1, Auto[!train_index, ])
-test_error <- mean((Auto[!train_index, "mpg"] - Auto.lm1.pre) ^ 2)
-poly_num <- 1
+# for 10 different train_index, check the n=1:10 error rate. 
+make_poly_10 <- function(){
+  for (i in 1:10){
+    set.seed(i)
+    train_index <- sample(c(TRUE, FALSE), size = nrow(Auto), replace = TRUE, prob = c(.5, .5))
+    if (i == 1)
+      {
+      temp_data <- make_poly_1st(10, train_index)
+      plot(test_err ~ poly, data = temp_data, type = "b", ylim = range(15, 28))
+      # print (head(temp_data))
+      }
+    else
+      {
+      temp_data <- make_poly_1st(10, train_index)
+      lines(temp_data$test_err, type = "b", col = i)
+      # print (head(temp_data))
+      }
+    
+  }
+}
 
-Auto.lm2 = lm(mpg ~ poly(horsepower, 2), data = Auto, subset = train_index)
-Auto.lm2.pre = predict(Auto.lm2, Auto[!train_index, ])
-test_error[length(test_error)+1] <- mean((Auto[!train_index, "mpg"] - Auto.lm2.pre)^2)
-poly_num[length(poly_num)+1] <- 2
-
-
+make_poly_10()
 ```
 
 note to color the work in the HTML
