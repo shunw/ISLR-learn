@@ -75,8 +75,34 @@ make_poly_10()
 *method:* 
 *result:* 
 __STOP IN THE PAGE 194, NEXT STEP IS TO MAKE THE FIGURE 5.4 AND ALSO NEED TO SEE IF MULTIPLE LOOCV COULD WORK__
+__QUESTION: THE LENGTH OF THE TRAIN INDEX IS SAME AS THE DATA, SO IS THE TEST DATA SET, IT SHOULD BE NOT RIGHT. __
 ```{r}
+library(ISLR)
+make_LOOCV_poly <- function(n, train_index){
+  poly_temp <- NULL
+  test_err <- NULL
+  for (i in 1:n ) {
+    temp.lm = lm(mpg ~ poly(horsepower, n), data = Auto, subset = train_index)
+    temp.pre = predict(temp.lm, Auto[!train_index, ])
+    print (length(temp.pre))
+    test_err <- c(test_err, mean((Auto[!train_index, "mpg"] - temp.pre)^2))
+    poly_temp <- c(poly_temp, i)
+  }
+  return (data.frame("poly_temp" = poly_temp, "test_err" = test_err))
+}
 
+train_index_0 <- sample(1:nrow(Auto), 1, replace = FALSE)
+train_index <- sample(TRUE, size = nrow(Auto), replace = TRUE)
+train_index[test_index_0] <- FALSE
+nrow(Auto[train_index, ])
+make_LOOCV_poly(10, test_index)
+length(!train_index)
+make_LOOCV_plot <- function() {
+  for (i in 1:10){
+    set.seed(i)
+    train_index <- sample()
+  }
+}
 ```
 
 note to color the work in the HTML
