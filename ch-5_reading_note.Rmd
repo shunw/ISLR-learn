@@ -5,11 +5,12 @@ date: "June 29, 2016"
 output: html_document
 ---
 
-| Type | Subtype | Method | Merit | Demerit |
-| --- | --- | --- | --- | --- |
-| Cross-Validation | --- | --- | --- | ---|
-| 1 | valid set | split the data into half, one is training data, the other is test data | --- | --- |
-| 2 | Leave-One-Out CV | a single observation is used for validation | unbiased due to more data than item 1 - valid set/ no randomness in the training or validation set splits. ==> run LOOCV multiple times will yield the same results.  | highly variable (due to single observation) |
+| Type | Subtype | Method | Merit | Demerit | modeling |
+| --- | --- | --- | --- | --- | --- |
+| Cross-Validation | --- | --- | --- | ---| --- |
+| 1 | valid set | split the data into half, one is training data, the other is test data | --- | --- | --- |
+| 2 | Leave-One-Out CV | a single observation is used for validation, should use from the first to last row of data | unbiased due to more data than item 1 - valid set/ no randomness in the training or validation set splits. ==> run LOOCV multiple times will yield the same results.  | highly variable (due to single observation) | can be used with any kind of predictive modeling, like logistic regression/ linear discriminant analysis |
+| 3 | k-Fold Cross-Validation | alternative to LOOCV/ randomly dividing the set of observation into k groups: the first fold is set as a vaildation set, the method is fit on the remaining k-1 folds. The procedure is repeated k times. The k-fold CV is estimate is computed by averaging the values. function 5.3 page 195| *TBC* | *TBC* | *TBC* |
 
 
 ###Cross-Validation
@@ -72,37 +73,45 @@ make_poly_10()
 
 **example @ 5.1.2**
 *purpose:* to valid the figure 5.4
-*method:* 
-*result:* 
-__STOP IN THE PAGE 194, NEXT STEP IS TO MAKE THE FIGURE 5.4 AND ALSO NEED TO SEE IF MULTIPLE LOOCV COULD WORK__
-__QUESTION: THE LENGTH OF THE TRAIN INDEX IS SAME AS THE DATA, SO IS THE TEST DATA SET, IT SHOULD BE NOT RIGHT. __
+*method:* random choose one as the test data, and the rest of the data is the training data. 
+*result:* the error is largely variable.   
+*notice:* the following method is wrong. the LOOCV should calculate all the records of data, which means, if you have 100 rows of data, you need to do the LOOCV 100 times. Then you could get the error rate. 
 ```{r}
 library(ISLR)
 make_LOOCV_poly <- function(n, train_index){
   poly_temp <- NULL
   test_err <- NULL
   for (i in 1:n ) {
-    temp.lm = lm(mpg ~ poly(horsepower, n), data = Auto, subset = train_index)
+    temp.lm = lm(mpg ~ poly(horsepower, i), data = Auto, subset = train_index)
+    # print (summary(temp.lm)$coef)
     temp.pre = predict(temp.lm, Auto[!train_index, ])
-    print (length(temp.pre))
     test_err <- c(test_err, mean((Auto[!train_index, "mpg"] - temp.pre)^2))
     poly_temp <- c(poly_temp, i)
   }
-  return (data.frame("poly_temp" = poly_temp, "test_err" = test_err))
+  
+  return (temp_data <- data.frame("poly_temp" = poly_temp, "test_err" = test_err))
 }
 
-train_index_0 <- sample(1:nrow(Auto), 1, replace = FALSE)
-train_index <- sample(TRUE, size = nrow(Auto), replace = TRUE)
-train_index[test_index_0] <- FALSE
-nrow(Auto[train_index, ])
-make_LOOCV_poly(10, test_index)
-length(!train_index)
 make_LOOCV_plot <- function() {
   for (i in 1:10){
     set.seed(i)
-    train_index <- sample()
+    train_index_0 <- sample(1:nrow(Auto), 1, replace = FALSE)
+    train_index <- sample(TRUE, size = nrow(Auto), replace = TRUE)
+    train_index[train_index_0] <- FALSE
+    
+    temp_data <- make_LOOCV_poly(10, train_index)
+    # print (temp_data)
+    if (i == 1) {
+      plot(test_err ~ poly_temp, type = 'b', data = temp_data, ylim = range(0, 150), xlim = range(0, 12))
+    }
+    else {
+      lines(temp_data$poly_temp, temp_data$test_err, type = 'b', col=i)
+    }
   }
 }
+
+make_LOOCV_plot()
+
 ```
 
 note to color the work in the HTML
