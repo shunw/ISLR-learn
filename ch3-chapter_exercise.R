@@ -115,7 +115,7 @@ plot(ad.lm_all)
 ## following is to find the key elements. 
 lm.boston.fit = lm(medv ~ ., data = Boston)
 summary(lm.boston.fit)
-
+library(MASS)
 reg.boston = regsubsets(medv ~ ., data = Boston)
 summary(reg.boston)
 

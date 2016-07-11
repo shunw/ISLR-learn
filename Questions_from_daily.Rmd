@@ -10,3 +10,14 @@ Two/ Three predictors, two rows of data, after calculate with lm function, only 
 WHY?
 
 -- guess this is depend on how many data you have. If you have two row of data, only one predictor's coef would be fixed. But if you have more, then more predictors' coef could be made. 
+
+#Question 2
+For the real data, the predictors could be 100, while the data could be 200-300. 
+1. Use the pairs, cannot show. 
+2. Use the regsubsets, warning message is: 
+  Error in leaps.exhaustive(a, really.big) : 
+    Exhaustive search will be S L O W, must specify really.big=T
+  In addition: Warning message:
+  In leaps.setup(x, y, wt = wt, nbest = nbest, nvmax = nvmax, force.in = force.in,  :
+    162  linear dependencies found
+===> could not use these two function directly. Need to clean the data first.   
