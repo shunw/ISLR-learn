@@ -156,7 +156,7 @@ cv.error.10
 make_data_w_k_index <- function(origin_data, k){
   n <- sample(1:100, 1, replace = TRUE)
   set.seed(n)
-  # print (n)ß
+  # print (n)
   train_index_0 <- rep_len(1:k, length.out = nrow(origin_data))
   train_index_0 <- sample(train_index_0, size = length(train_index_0), replace = FALSE)
   # print (head(train_index_0))
@@ -235,6 +235,14 @@ alpha.mpg = function(data, index) {
 }
 alpha.mpg(Auto, 1:nrow(Auto))
 boot(Auto, alpha.mpg, R = 1000)
+
+library(ISLR)
+boot.fn = function(data, index) 
+  return (coef(lm(mpg~horsepower, data = data, subset = index)))
+boot.fn(Auto, 1:392)
+
+coef(lm(mpg~horsepower, data = Auto))
+nrow(Auto)
 ```
 
 note to color the work in the HTML
