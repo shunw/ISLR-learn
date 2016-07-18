@@ -1,0 +1,27 @@
+---
+title: "ch-5_Applied"
+author: "Wendy"
+date: "July 18, 2016"
+output: html_document
+---
+
+ <http://rmarkdown.rstudio.com>.
+
+####Exercise(skipped)
+
+####Applied
+######5. In Chapter 4, we used logistic regression to predict the probability of *default* using *income* and *balance* on the *Default* data set. We will now estimate the test error of this logistic regression model using the validation set approach. Do not forget to set a random seed before beginning your analysis.
+
+(a) Fit a logistic regression model that uses income and balance to predict default.
+```{r}
+library(ISLR)
+default.glm.a <- glm(default ~ income + balance, data = Default, family = "binomial")
+
+default.glm.pre.a <- predict(default.glm.a, Default)
+
+default.glm.a.lab <- rep("No", nrow(Default))
+
+default.glm.a.lab[which(default.glm.a.lab < .5)] <- "Yes"
+
+mean(default.glm.a.lab == Default$default)
+```
