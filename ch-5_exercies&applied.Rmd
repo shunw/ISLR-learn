@@ -25,3 +25,41 @@ default.glm.a.lab[which(default.glm.a.lab < .5)] <- "Yes"
 
 mean(default.glm.a.lab == Default$default)
 ```
+
+
+(b) Using the validation set approach, estimate the test error of this model. In order to do this, you must perform the following steps:
+
+i. Split the sample set into a training set and a validation set.
+```{r}
+set.seed(1)
+train_index <- sample(c(TRUE, FALSE), nrow(Default), replace = TRUE)
+```
+
+ii. Fit a multiple logistic regression model using only the training observations.
+```{r}
+default.glm.b <- glm(default ~ income + balance, data = Default, subset = train_index, family = "binomial")
+```
+
+iii. Obtain a prediction of default status for each individual in the validation set by computing the posterior probability of default for that individual, and classifying the individual to the default category if the posterior probability is greater than 0.5.
+
+```{r}
+default.b.pre <- predict(default.glm.b, Default[!train_index,])
+default.b.pre_1 <- rep("No", length(default.b.pre))
+default.b.pre_1[which(default.b.pre > .5)] <- "Yes"
+```
+
+
+iv. Compute the validation set error, which is the fraction of the observations in the validation set that are misclassified.
+```{r}
+mean(default.b.pre_1 == Default[!train_index, "default"])
+```
+
+(c) Repeat the process in (b) three times, using three different splits of the observations into a training set and a validation set. Comment on the results obtained.
+
+1st is .9699172
+2nd is .9706352
+3rd is .9711382
+
+comment: the variannt is around .002, pretty stable. the error rate is higher than the non-CV error rate, which is .9667, this is a little abnormal to me. 
+
+(d) Now consider a logistic regression model that predicts the probability of default using income, balance, and a dummy variable for student. Estimate the test error for this model using the validation set approach. Comment on whether or not including a dummy variable for student leads to a reduction in the test error rate.
