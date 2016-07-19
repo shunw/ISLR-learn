@@ -63,3 +63,64 @@ mean(default.b.pre_1 == Default[!train_index, "default"])
 comment: the variannt is around .002, pretty stable. the error rate is higher than the non-CV error rate, which is .9667, this is a little abnormal to me. 
 
 (d) Now consider a logistic regression model that predicts the probability of default using income, balance, and a dummy variable for student. Estimate the test error for this model using the validation set approach. Comment on whether or not including a dummy variable for student leads to a reduction in the test error rate.
+
+also run three times of the error code:
+1st .9715
+2nd .9714
+3rd .9709
+
+the average of the error code with a dummy variable for student leads to a reduction in the test error rate. 
+*checked one ans in the github, it said that adding dummy variable does not leads to a reduction in the test error rate. Then, how much reduction would be accountable.*
+```{r}
+library(ISLR)
+set.seed(1)
+train_index <- sample(c(TRUE, FALSE), nrow(Default), replace = TRUE)
+
+default.glm.d <- glm(default ~ income + balance + student, data = Default, subset = train_index, family = "binomial")
+
+default.pre.d <- predict(default.glm.d, Default[!train_index, ])
+
+default.pre.d_1 <- rep("No", length(default.pre.d))
+default.pre.d_1[which(default.pre.d > .5)] <- "Yes"
+mean(default.pre.d_1 == Default[!train_index, "default"])
+```
+
+######6. We continue to consider the use of a logistic regression model to predict the probability of default using income and balance on the Default data set. In particular, we will now compute estimates for the standard errors of the income and balance logistic regression coefficients in two different ways: (1) using the bootstrap, and (2) using the standard formula for computing the standard errors in the glm() function.Do not forget to set a random seed before beginning your analysis.
+
+(a) Using the *summary()* and *glm()* functions, determine the estimated standard errors for the coefficients associated with *income* and *balance* in a multiple logistic regression model that uses both predictors.
+
+std error: 
+income: 4.985167e-06
+balance: 2.273731e-04
+```{r}
+set.seed(1)
+
+summary(glm(default ~ income + balance, data = data, subset = index, family = "binomial"))$coef
+
+standard_form_part <- function(data, index)
+  return (summary(glm(default ~ income + balance, data = data, subset = index, family = "binomial"))$coef)
+```
+
+
+(b) Write a function, boot.fn(), that takes as input the Default data set as well as an index of the observations, and that outputs the coefficient estimates for income and balance in the multiple logistic regression model.
+(c) Use the boot() function together with your boot.fn() function to estimate the standard errors of the logistic regression coefficients for income and balance.
+(d) Comment on the estimated standard errors obtained using the glm() function and using your bootstrap function.
+
+The income std error is: 4.785130e-06  
+the balance std error is: 2.249343e-04  
+
+Using boot std.error seems (very little) smaller than the standard one. I use R = 100 times. 
+
+*special note:* in boot.fn, I tried the summary(glm())$coef, it turned out there are t1 to t12, quite confusing. 
+But after I changed to coef(glm()), it back to normal. I'm not sure if I used a wrong function. 
+
+```{r}
+boot.fn <- function(data, index){
+  return (coef(glm(default ~ income + balance, data = data, subset = index, family = "binomial")))
+}
+
+library(boot)
+boot(Default, boot.fn, R = 100)
+
+boot.fn(Default, 1:400)
+```
