@@ -159,21 +159,27 @@ iii. Use the posterior probability for the ith observation in order to predict w
 iv. Determine whether or not an error was made in predicting the direction for the ith observation. If an error was made, then indicate this as a 1, and otherwise indicate it as a 0.
 
 ```{r}
+library(ISLR)
 one_step <- function(data, index){
   temp_glm <- glm(Direction ~ Lag1 + Lag2, data = data[-index, ], family = "binomial")
   temp_glm_pre <- predict(temp_glm, data[index, ], type = "response")
   if (temp_glm_pre > .5){
-    temp_label <- "Up"
+    temp_label = "Up"
   }
-  else temp_label <- "Down"
+  else temp_label = "Down"
   
-  temp_corr <- 0
-  if (temp_label == data[index, "Direction"]){
-    temp_corr <- 1
+   temp_corr = 0
+  if (temp_label != data[index, "Direction"]){
+    temp_corr = 1
   }
+#    is_up = predict.glm(temp_glm, Weekly[index,], type="response") > 0.5
+#    is_true_up = Weekly[index,]$Direction == "Up"
+#    if (is_up != is_true_up)
+#      temp_corr = 1
   
   return (temp_corr)
 }
+head(Weekly$Direction)
 
 error_rate <- 0
 for (i in 1:nrow(Weekly)) {
@@ -183,7 +189,7 @@ error_rate
 ```
 
 the following is provided by the git hub, need to check where is the difference. 
-#######need to check the difference here. 
+*the logic relationship is wrong.*
 ```{r}
 count = rep(0, dim(Weekly)[1])
 for (i in 1:(dim(Weekly)[1])) {
@@ -198,7 +204,25 @@ sum(count)
 
 (e) Take the average of the n numbers obtained in (d)iv in order to obtain the LOOCV estimate for the test error. Comment on the results.
 
-the error rate is 599/1089 = .55
+the error rate is 490/1089 = .45
 ```{r}
-599/1089
+490/1089
+```
+
+8. We will now perform cross-validation on a simulated data set.
+(a) Generate a simulated data set as follows:
+In this data set, what is n and what is p? Write out the model used to generate the data in equation form.  
+
+-- n is y, p is x, and x^2. 
+*Question:* try to use the lm(y ~ x + I(x^2)) would be similar but use lm(y ~ poly(x, 2)) does not similar. What is the differentce between the x + I(x^2) and poly(x, 2)
+```{r}
+set.seed(1)
+y=rnorm(100)
+x=rnorm(100)
+y=x-2*x^2+rnorm(100)
+
+cv_8.glm <- lm(y ~ x + I(x^2))
+cv_8.glm.poly <- lm(y ~ poly(x, 2))
+summary(cv_8.glm)
+summary(cv_8.glm.poly)
 ```
