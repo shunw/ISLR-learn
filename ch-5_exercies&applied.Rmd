@@ -93,9 +93,9 @@ std error:
 income: 4.985167e-06
 balance: 2.273731e-04
 ```{r}
-set.seed(1)
+# set.seed(1)
 
-summary(glm(default ~ income + balance, data = data, subset = index, family = "binomial"))$coef
+# summary(glm(default ~ income + balance, data = data, subset = index, family = "binomial"))$coef
 
 standard_form_part <- function(data, index)
   return (summary(glm(default ~ income + balance, data = data, subset = index, family = "binomial"))$coef)
@@ -222,7 +222,24 @@ x=rnorm(100)
 y=x-2*x^2+rnorm(100)
 
 cv_8.glm <- lm(y ~ x + I(x^2))
-cv_8.glm.poly <- lm(y ~ poly(x, 2))
-summary(cv_8.glm)
-summary(cv_8.glm.poly)
+cv_8.glm.poly <- lm(y ~ poly(x, 2, raw = TRUE))
+summary(cv_8.glm)$coef
+summary(cv_8.glm.poly)$coef
+```
+
+(b) Create a scatterplot of X against Y . Comment onwhat you find.
+
+--the relationship is a curve. 
+```{r}
+plot(y ~ x)
+```
+
+(c) Set a random seed, and then compute the LOOCV errors that result from fitting the following four models using least squares:
+![four models](photo_insert/question8_5.4.png)  
+Note you may find it helpful to use the data.frame() function to create a single data set containing both X and Y .
+
+```{r}
+X_Y <- data.frame("Y" = y, "X" = x)
+
+
 ```
