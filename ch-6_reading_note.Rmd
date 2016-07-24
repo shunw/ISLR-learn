@@ -1,0 +1,34 @@
+---
+title: "ch-6_reading_note <Linear Model Selection and Regularization>"
+author: "Wendy"
+date: "July 24, 2016"
+output: html_document
+---
+
+##Chapter Purpose: 
+####Prediction Accuracy: 
+1. n >> p: the LEAST SQUARES estimates tend to also have low variance, and hence will perform well on test observation
+2. n not >> p: a lot of variability in the LEAST SQUARES fit --> overfitting --> poor prediction 
+3. n < p: the variance is infinite so the LEAST SQUARES cannot be used at all. By constraining or shrinking the estimated coef, we can often substantially reduce the variance at the cost of a negligible increase of bias. (Not sure how to make estimation from this condition. )
+
+####Model Interpretability: 
+| Methods | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
+| Subset Selection | --- | --- | --- | --- |
+| Shrinkage | --- | --- | --- | --- |
+| Dimension Reduction | --- | --- | --- | --- |
+
+###Cross-Validation
+####1. Valid Set
+####from page 190 lab from 205 
+
+**example @ 5.1.1**
+*purpose:* to check which regression function is better  
+*method:* to make split the dataset into two part.   
+*result:* the poly(horsepower, 2) show more lower error rate. 
+```{r}
+library(ISLR)
+set.seed(1)
+set.seed(2)
+train_index = sample(c(TRUE, FALSE), size = nrow(Auto), replace = TRUE, prob = c(.5, .5))
+
