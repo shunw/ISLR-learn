@@ -365,7 +365,7 @@ t.test(Boston$medv)
 mu_med <- median(Boston$medv)
 ```
 
-(f) We now would like to estimate the standard error ofμˆmed.Unfortunately, there is no simple formula for computing the standard error of the median. Instead, estimate the standard error of the median using the bootstrap. Comment on your findings.  
+(f) We now would like to estimate the standard error of mu_med.Unfortunately, there is no simple formula for computing the standard error of the median. Instead, estimate the standard error of the median using the bootstrap. Comment on your findings.  
 -- original is .412732, bias is .00188892, std.error is .01563807. The median's bias is larger than mean. 
 ```{r}
 boot.fn_med <- function(data, index){
@@ -389,7 +389,7 @@ boot(Boston$medv, boot.fn_med1, 100)
 quantile(Boston$medv, 0.1)
 ```
 
-(h) Use the bootstrap to estimate the standard error of μˆ0.1. Comment on your findings.  
+(h) Use the bootstrap to estimate the standard error of mu<sub>0.1</sub>. Comment on your findings.  
 -- orginal is still the same as the estimate one. the std.error is large, maybe this is because in the edge of the data set, the more large variant it is. 
 ```{r}
 boot.fn_10per <- function(data, index){

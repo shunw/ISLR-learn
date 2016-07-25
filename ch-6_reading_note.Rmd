@@ -12,15 +12,18 @@ output: html_document
 3. n < p: the variance is infinite so the LEAST SQUARES cannot be used at all. By constraining or shrinking the estimated coef, we can often substantially reduce the variance at the cost of a negligible increase of bias. (Not sure how to make estimation from this condition. )
 
 ####Model Interpretability: 
-| Methods | --- | --- | --- | --- |
+| Methods | Select Judgement | --- | --- | --- |
 | --- | --- | --- | --- | --- |
-| Subset Selection | --- | --- | --- | --- |
+| Subset Selection | CV prediction error, C<sub>p</sub>, BIC, or ajusted R<sup>2</sup> | --- | --- | --- |
 | Shrinkage | --- | --- | --- | --- |
 | Dimension Reduction | --- | --- | --- | --- |
 
-###Cross-Validation
-####1. Valid Set
-####from page 190 lab from 205 
+###Subset Selection<Page 219>
+####1. Best Subset Selection
+####from page 219 lab from ???   
+
+Algorithm 6.1
+![Algorithm 6.1](photo_insert/ch-6.1_best_subset_selection_.png)
 
 **example @ 5.1.1**
 *purpose:* to check which regression function is better  
@@ -28,7 +31,7 @@ output: html_document
 *result:* the poly(horsepower, 2) show more lower error rate. 
 ```{r}
 library(ISLR)
-set.seed(1)
-set.seed(2)
-train_index = sample(c(TRUE, FALSE), size = nrow(Auto), replace = TRUE, prob = c(.5, .5))
+head(Credit)
+raw <- read.csv("Credit.csv")
 
+```
