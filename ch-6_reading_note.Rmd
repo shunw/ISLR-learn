@@ -12,9 +12,9 @@ output: html_document
 3. n < p: the variance is infinite so the LEAST SQUARES cannot be used at all. By constraining or shrinking the estimated coef, we can often substantially reduce the variance at the cost of a negligible increase of bias. (Not sure how to make estimation from this condition. )
 
 ####Model Interpretability: 
-| Methods | Select Judgement | --- | --- | --- |
+| Methods | Select Judgement | Fault | Merit | --- |
 | --- | --- | --- | --- | --- |
-| Subset Selection | CV prediction error, C<sub>p</sub>, BIC, or ajusted R<sup>2</sup> | --- | --- | --- |
+| Subset Selection | CV prediction error, C<sub>p</sub>, BIC, or ajusted R<sup>2</sup> | computational limitations: the number of possible models that must be considered grwos rapidly as *p* increases.It becomes computationally infeasible for values of p greater than 40 | simple and conceptually appealing approach | --- |
 | Shrinkage | --- | --- | --- | --- |
 | Dimension Reduction | --- | --- | --- | --- |
 
@@ -33,5 +33,6 @@ Algorithm 6.1
 library(ISLR)
 head(Credit)
 raw <- read.csv("Credit.csv")
-
+dim(raw)
+2^20
 ```
