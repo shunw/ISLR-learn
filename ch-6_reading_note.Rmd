@@ -14,7 +14,7 @@ output: html_document
 ####Model Interpretability: 
 | Methods | Select Judgement | Fault | Merit | R_function |
 | --- | --- | --- | --- | --- |
-| Subset Selection | CV prediction error, C<sub>p</sub>, BIC, or ajusted R<sup>2</sup> | computational limitations: the number of possible models that must be considered grwos rapidly as *p* increases.It becomes computationally infeasible for values of p greater than 40 | simple and conceptually appealing approach | regsubsets()/ *leaps library* |
+| Subset Selection | CV prediction error, C<sub>p</sub>, BIC, or ajusted R<sup>2</sup> | computational limitations: the number of possible models that must be considered grwos rapidly as *p* increases.It becomes computationally infeasible for values of p greater than 40 | simple and conceptually appealing approach | regsubsets()/ *leaps library*/ use summary() could return R<sup>2</sup>, RSS, adjusted R<sup>2</sup>, C<sub>p</sub>, BIC  |
 | Shrinkage | --- | --- | --- | --- |
 | Dimension Reduction | --- | --- | --- | --- |
 
@@ -27,12 +27,57 @@ Algorithm 6.1
 
 **Lab.6.5.1: Best Subset Selection**
 *purpose:* to practice the best subset selection  
-*method:* to make split the dataset into two part.   
-*result:* the poly(horsepower, 2) show more lower error rate. 
+*method:* by follow the lab method  
+*result:*  
 ```{r}
 library(ISLR)
 names(Hitters)
 sum(is.na(Hitters))
 Hitters = na.omit(Hitters)
+
+library(leaps)
+regfit.full = regsubsets(Salary ~ ., Hitters)
 dim(Hitters)
+summary(regfit.full)
+
+regfit.full = regsubsets(Salary ~ ., data = Hitters, nvmax = 19)
+reg.summary = summary(regfit.full)
+
+names(reg.summary)
 ```
+
+My ans --- Lab asked to plot the r2, ajstr2, bic, etc. --- But seems something wrong. 
+```{r}
+regfit.full_plot = data.frame("x" = c(1:19), "r2" = reg.summary$rsq, "adjr2" = reg.summary$adjr2, "cp" = reg.summary$cp, "bic" = reg.summary$cp)
+
+plot(regfit.full_plot$x, regfit.full_plot$r2, type = "l", xlab = "predictor number", ylab = "error rate", ylim)
+
+lines(regfit.full_plot$x, regfit.full_plot$adjr2, type = "l",col = "red")
+
+lines(regfit.full_plot$x, regfit.full_plot$cp, type = "l",col = "blue")
+
+lines(regfit.full_plot$x, regfit.full_plot$bic, type = "l",col = "green")
+
+regfit.full_plot$cp
+
+```
+
+lab's ans --- Lab asked to plot the r2, ajstr2, bic, etc.   
+*Wendy's Comment* not need to xlab data, totally different than I thought before. =(
+```{r}
+par(mfrow = c(2, 2))
+plot(reg.summary$rss, xlab = "Number of Variables", ylab = "RSS", type = "l")
+
+plot(reg.summary$adjr2, xlab = "Number of Variables", ylab = "Adjusted RSQ", type = "l")
+which.max(reg.summary$adjr2)
+points(11, reg.summary$adjr2[11], col = "red", cex = 2, pch = 20)
+
+plot(reg.summary$cp, xlab = "Number of Variables", ylab = "Cp", type = "l")
+points(which.min(reg.summary$cp), reg.summary$cp[which.min(reg.summary$cp)], col = "red", cex = 2, pch = 20)
+
+plot(reg.summary$bic, xlab = "Number of Variables", ylab = "BIC", type = "l")
+points(which.min(reg.summary$bic), reg.summary$bic[which.min(reg.summary$bic)], col = "red", cex = 2, pch = 20)
+```
+
+STOPPED IN THE PAGE 260 IN THE LAST LINES FOR THE REGSUBSETS()
+PLOT(REGFIT.FULL, SCALE = 'R2')

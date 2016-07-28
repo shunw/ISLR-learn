@@ -1,0 +1,16 @@
+---
+title: "Plots"
+author: "Wendy"
+date: "June 28, 2016"
+output: html_document
+---
+
+| Formula | Function | --- | --- | --- |
+| --- | --- | --- | --- | --- |
+| NEW | --- | --- | --- | --- |
+| Plot | --- | --- l--- | --- |
+| --- | --- | --- | --- | --- |
+| Point | --- | --- l--- | --- |
+| ADDITIVE | --- | --- | --- | --- |
+| which.max() | find the max pint location | --- | --- | --- |
+| par(mfrow = c(x, x)) | split the drawing | --- | --- | --- |
