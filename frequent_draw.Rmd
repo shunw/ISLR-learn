@@ -5,12 +5,13 @@ date: "June 28, 2016"
 output: html_document
 ---
 
-| Formula | Function | --- | --- | --- |
+| Formula | Formula w Build-in | Function | --- | --- |
 | --- | --- | --- | --- | --- |
 | NEW | --- | --- | --- | --- |
 | Plot | --- | --- l--- | --- |
+| --- | regsubsets -> Plot(regit.full, scale = "cp/bic/adjr2/ r2") | show the predictor combination with cp/bic...value l--- | --- |
 | --- | --- | --- | --- | --- |
 | Point | --- | --- l--- | --- |
 | ADDITIVE | --- | --- | --- | --- |
-| which.max() | find the max pint location | --- | --- | --- |
-| par(mfrow = c(x, x)) | split the drawing | --- | --- | --- |
+| which.max() | --- | find the max pint location | --- | --- |
+| par(mfrow = c(x, x)) | --- | split the drawing | --- | --- |

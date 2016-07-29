@@ -14,8 +14,14 @@ output: html_document
 ####Model Interpretability: 
 | Methods | Select Judgement | Fault | Merit | R_function |
 | --- | --- | --- | --- | --- |
-| Subset Selection | CV prediction error, C<sub>p</sub>, BIC, or ajusted R<sup>2</sup> | computational limitations: the number of possible models that must be considered grwos rapidly as *p* increases.It becomes computationally infeasible for values of p greater than 40 | simple and conceptually appealing approach | regsubsets()/ *leaps library*/ use summary() could return R<sup>2</sup>, RSS, adjusted R<sup>2</sup>, C<sub>p</sub>, BIC  |
+| Subset | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
+| Best Subset Selection | CV prediction error, C<sub>p</sub>, BIC, or ajusted R<sup>2</sup> | computational limitations: the number of possible models that must be considered grows rapidly as *p* increases.It becomes computationally infeasible for values of p greater than 40 | simple and conceptually appealing approach | regsubsets()/ *leaps library*/ =>  summary() could return R<sup>2</sup>, RSS, adjusted R<sup>2</sup>, C<sub>p</sub>, BIC => coef(regfit.full, 6) 6 predictors combination with their coef |
+| Forward Stepwise Selection | *same as above* | not guarantee to find the best possbile model | computationally efficient / high-dimensional setting where n < p, but may not yield a unique solution | --- |
+| Barkward Stepwise Selection | *same as above* | *same as above* | computationally efficient / high-dimensional setting but request n > p, may not yield a unique solution | --- |
+| --- | --- | --- | --- | --- |
 | Shrinkage | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
 | Dimension Reduction | --- | --- | --- | --- |
 
 ###Subset Selection<Page 219>
@@ -48,17 +54,17 @@ names(reg.summary)
 
 My ans --- Lab asked to plot the r2, ajstr2, bic, etc. --- But seems something wrong. 
 ```{r}
-regfit.full_plot = data.frame("x" = c(1:19), "r2" = reg.summary$rsq, "adjr2" = reg.summary$adjr2, "cp" = reg.summary$cp, "bic" = reg.summary$cp)
-
-plot(regfit.full_plot$x, regfit.full_plot$r2, type = "l", xlab = "predictor number", ylab = "error rate", ylim)
-
-lines(regfit.full_plot$x, regfit.full_plot$adjr2, type = "l",col = "red")
-
-lines(regfit.full_plot$x, regfit.full_plot$cp, type = "l",col = "blue")
-
-lines(regfit.full_plot$x, regfit.full_plot$bic, type = "l",col = "green")
-
-regfit.full_plot$cp
+# regfit.full_plot = data.frame("x" = c(1:19), "r2" = reg.summary$rsq, "adjr2" = reg.summary$adjr2, "cp" = reg.summary$cp, "bic" = reg.summary$cp)
+# 
+# plot(regfit.full_plot$x, regfit.full_plot$r2, type = "l", xlab = "predictor number", ylab = "error rate", ylim)
+# 
+# lines(regfit.full_plot$x, regfit.full_plot$adjr2, type = "l",col = "red")
+# 
+# lines(regfit.full_plot$x, regfit.full_plot$cp, type = "l",col = "blue")
+# 
+# lines(regfit.full_plot$x, regfit.full_plot$bic, type = "l",col = "green")
+# 
+# regfit.full_plot$cp
 
 ```
 
@@ -79,5 +85,57 @@ plot(reg.summary$bic, xlab = "Number of Variables", ylab = "BIC", type = "l")
 points(which.min(reg.summary$bic), reg.summary$bic[which.min(reg.summary$bic)], col = "red", cex = 2, pch = 20)
 ```
 
-STOPPED IN THE PAGE 260 IN THE LAST LINES FOR THE REGSUBSETS()
-PLOT(REGFIT.FULL, SCALE = 'R2')
+plot, the predictor combination with different value of cp/ bic/ adjst r2, etc
+```{r}
+plot(regfit.full, scale = "r2")
+plot(regfit.full, scale = "adjr2")
+plot(regfit.full, scale = "Cp")
+plot(regfit.full, scale = "bic")
+```
+
+check the coef with different predictors combinations.
+```{r}
+coef(regfit.full, 1)
+```
+
+####2. Stepwise Selection
+####from page 221 lab from ???   
+
+Algorithm 6.2
+![Algorithm 6.2](photo_insert/ch-Ag6.2_stepwise_selection_.png)
+
+Algorithm 6.3
+![Algorithm 6.3](photo_insert/ch-Ag6.3_backward_stepwise_selection_.png)
+
+####3. Choose the Optimal Model
+####from page 224 lab from ???  
+
+1. estimate the test error by making an adjustment to the training error
+
+C<sub>p</sub> estimate of test MSE
+![Cp estimate of test MSE](photo_insert/ch-6.2_Cp_estimate_testMSE.png)
+
+2. estimate the test error by using either a validation set approach or a CV approach. 
+
+**6.1.3: Choosing the Optimal Model**
+*purpose:* to draw the figure 6.2   
+*method:* try the best subset    
+*result:* 
+*comment:* not sure how to calculate the MSE for the C<sub>p</sub> and BIC
+```{r}
+credit <- read.csv("Credit.csv")
+credit <- credit[, -1]
+
+credit.full <- regsubsets(Balance ~ ., credit, nvmax = 11)
+
+summary(credit.full)$cp
+
+plot(summary(credit.full)$cp, type = "b", ylab = "Cp", xlab = "Number of Predictors")
+which.min(summary(credit.full)$cp)
+
+plot(summary(credit.full)$bic, type = "b", ylab = "BIC", xlab = "Number of Predictors")
+which.min(summary(credit.full)$bic)
+
+plot(summary(credit.full)$adjr2, type = "b", ylab = "Ajusted R2", xlab = "Number of Predictos")
+which.max(summary(credit.full)$adjr2)
+```
