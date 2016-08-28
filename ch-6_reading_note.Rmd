@@ -18,14 +18,26 @@ output: html_document
 | Shrinkage | --- | --- | --- | --- |
 | Dimension Reduction | --- | --- | --- | --- |
 
-####Choose Optimal Model with C<sub>p</sub>, AIC, BIC and Ajusted R<sup>2</sup>: 
+####(w 6.1)Choose Optimal Model with C<sub>p</sub>, AIC, BIC and Ajusted R<sup>2</sup>: 
+####<span style="color:orange"> Skipped for now. </span>  
 | Item | --- | --- |--- | --- |
 | C<sub>p</sub> | --- | --- | --- | --- |
 | AIC (Akaike information criterion) | --- | --- | --- | --- |
 | BIC (Bayesian information criterion) | --- | --- | --- | --- |
 | Adjusted R<sup>2</sup> | --- | --- | --- | --- |
 
-###Subset Selection<Page 219>
+####(w 6.2)Shrinkage Methods: 
+| Item | Explanation | Shrinkage Penalty | Important | Note | Benefit | Disadvantage | Work Best Situation |
+| Ridge Regression (page 229)| similar to least squares, except that the coef are estimated by minimizing a slightly different quantity. <span style="color:orange"> check the 6.5, page 229 </span> | the second term: lambda = 0, penalty term no effect; lambda -> infinite, the penalty increase, and the ridge regression coef estimates will approach zero. | select a good value for lambda | apply ridge regression after standardizing the predictors, because scale equivariant will also impact the value of X<sub>j</sub>Beta<sub>j</sub>/ formula 6.6 page 231 | bias-variance trade-off: lambda increase --> the flexibility of the ridge regression fit decrease --> decrease variance increase bias --> impact the test mean squared error mean // computation advantages over best subset selection | include all p predictors, which is not a problem for prediction accuracy, but create a challenge in model interpretation | the relationship between the response and the predictors is close to linear. least squares estimations have high variance but low bias, like: p > n or p is almost as large as n |
+| Lasso (page 233) | ell 1 penalty has the effect of forcing some of coef estimates to be exactly to zero | --- | --- | --- | --- | overcome Ridge's disadvantage | --- |
+
+####Another fomulation: 
+when p = 2,   
+the lasso coef estimates have the smallest RSS out of all points that lie within the diamond defined by |beta<sub>1</sub>| + |beta<sub>2</sub>| <= s.   
+the ridge regression estimates have the smallest RSS out of all points that lie within the circle defined by beta<sub>1</sub><sup>2</sup> + beta<sub>2</sub><sup>2</sup> <= s.  
+Note: if s is large enough, coef is just as the least squares; if s is small enough, variable selection.
+
+###6.1 Subset Selection<Page 219>
 ####1. Best Subset Selection
 ####from page 219 lab from 258   
 
@@ -106,3 +118,4 @@ summary(regfit.bwd)
 
 context: 6.1.3 choose the optimal model --> page 224 Cp, AIC, BIC and xxx
 before page 261. about the Cp, aic, bic, etc, lab should be already talked about them in the Lab 6.5.1 and 6.5.2. 
+####Current skip the rest of the 6.1. and go into the 6.2, page 228
