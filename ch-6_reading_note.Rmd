@@ -15,27 +15,62 @@ output: html_document
 | Methods | Select Judgement | Fault | Merit | R_function |
 | --- | --- | --- | --- | --- |
 | Subset Selection | the most important: low test error. others: CV prediction error, C<sub>p</sub>, BIC, or ajusted R<sup>2</sup> | computational limitations: the number of possible models that must be considered grwos rapidly as *p* increases.It becomes computationally infeasible for values of p greater than 40 | simple and conceptually appealing approach | regsubsets()/ *leaps library*/ use summary() could return R<sup>2</sup>, RSS, adjusted R<sup>2</sup>, C<sub>p</sub>, BIC  |
-| Shrinkage | --- | --- | --- | --- |
-| Dimension Reduction | --- | --- | --- | --- |
+| Shrinkage | smallest cross validation error to determine lamda | --- | --- | --- |
+| Dimension Reduction | --- | serves to constrain the estimated beta<sub>j</sub>. this constraint has the potential to bias the coeffient estimates. | use in situations where p is large relative to n, selecting a value of M << p can significantly reduce the variance of the fitted coef | --- |
 
 ####(w 6.1)Choose Optimal Model with C<sub>p</sub>, AIC, BIC and Ajusted R<sup>2</sup>: 
 ####<span style="color:orange"> Skipped for now. </span>  
 | Item | --- | --- |--- | --- |
+| --- | --- | --- |--- | --- |
 | C<sub>p</sub> | --- | --- | --- | --- |
 | AIC (Akaike information criterion) | --- | --- | --- | --- |
 | BIC (Bayesian information criterion) | --- | --- | --- | --- |
 | Adjusted R<sup>2</sup> | --- | --- | --- | --- |
 
-####(w 6.2)Shrinkage Methods: 
+####(w 6.2)Shrinkage Methods:   
+A technique such as cross-validation can be used in order to determine which approach (ridge or lasso) is better on a particular data set.   
+Ridge performs better when the response is a function of many predictors, all with coefficients of roughly equal size.   
+Lasso performs better in a setting where a relatively small number of predictors have substantial coefficients, and the the remaining predictors have coefficients that are very small or that equal to zero.  
+As with ridge regression, when the least squares estimates have excessively high variance, the lasso solution can yield a reduction in variance at the expense of a small increase in bias, and consequently can generate more accurate predictions.   
+Unlike ridge regression, the lasso performs vairable selection, and hence results in models that are easier to interpret. 
+
+
 | Item | Explanation | Shrinkage Penalty | Important | Note | Benefit | Disadvantage | Work Best Situation |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | Ridge Regression (page 229)| similar to least squares, except that the coef are estimated by minimizing a slightly different quantity. <span style="color:orange"> check the 6.5, page 229 </span> | the second term: lambda = 0, penalty term no effect; lambda -> infinite, the penalty increase, and the ridge regression coef estimates will approach zero. | select a good value for lambda | apply ridge regression after standardizing the predictors, because scale equivariant will also impact the value of X<sub>j</sub>Beta<sub>j</sub>/ formula 6.6 page 231 | bias-variance trade-off: lambda increase --> the flexibility of the ridge regression fit decrease --> decrease variance increase bias --> impact the test mean squared error mean // computation advantages over best subset selection | include all p predictors, which is not a problem for prediction accuracy, but create a challenge in model interpretation | the relationship between the response and the predictors is close to linear. least squares estimations have high variance but low bias, like: p > n or p is almost as large as n |
-| Lasso (page 233) | ell 1 penalty has the effect of forcing some of coef estimates to be exactly to zero | --- | --- | --- | --- | overcome Ridge's disadvantage | --- |
+| Lasso (page 233) | *Difference from Ridge:* ell 1 penalty has the effect of forcing some of coef estimates to be exactly to zero ==> performs variable selection | same as ridge | --- | --- | --- | overcome Ridge's disadvantage | --- |
 
 ####Another fomulation: 
+![Another Formula for Ridge & Lasso](photo_insert/ch-6.2.2_lasso&ridge_6.8&6.9.png)
+![Equivalent to Best Subset](photo_insert/ch-6.2.2_best subset.png)
 when p = 2,   
 the lasso coef estimates have the smallest RSS out of all points that lie within the diamond defined by |beta<sub>1</sub>| + |beta<sub>2</sub>| <= s.   
 the ridge regression estimates have the smallest RSS out of all points that lie within the circle defined by beta<sub>1</sub><sup>2</sup> + beta<sub>2</sub><sup>2</sup> <= s.  
 Note: if s is large enough, coef is just as the least squares; if s is small enough, variable selection.
+  
+Fomulation 6.8 and 6.9 reveals a close connection between the lasso, ridge regression, and the best selection.   
+6.10 amounts to finding a set of coefficient estimates such that RSS is as small as possible. Unfortunately solving 6.10 is computationally infeasible when p is large.  
+Therefore, we can interpret ridge regression and the lasso as computationally feasible alternatives to best subset selection. 
+
+####(w 6.3)Dimension Reduction Methods (Page 242):   
+A class of approaches that transform the predictors and then fit a least squares model using the transformed variables.   
+  
+#####Two Steps:
+1. Principal Components Analysis(PCA): transformed predictors Z<sub>1</sub>, Z<sub>2</sub>, ..., Z<sub>M</sub> are obtained.   
+*the first/(till p) principal component* vector definces the line that is as close as possbile to the data/ *the first/(till p) principal component* direction of the data is that along which the observations vary the most.   
+In general, one can construct up to *p* distinct principal components. The second principal component Z<sub>2</sub> is a linear combination of the variables that is uncorrelated with Z<sub>1</sub>, and has largest variance subject to this constraint. Z<sub>1</sub> and Z<sub>2</sub> is zero correlation == their direction must be *perpendicular*; The first component will contain the most information.  
+  
+2. Principal Components Regression (PCR): the model is fit using these M preidctors.   
+If the assumption underlying PCR holds, then fitting a least squares model to Z<sub>1</sub>, ..., Z<sub>M</sub> will lead to better results than fitting a least squares model to X<sub>1</sub>, ..., X<sub>p</sub>, since most or all of the information in the data that relates to the response is contained in Z<sub>1</sub>, ..., Z<sub>M</sub>, and by estimating only M << p coefficients we can mitigate overfitting. 
+
+
+| Item | Preparation | Advantage | Disadvantage | Note |
+| --- | --- | --- | --- | --- |
+| Principal Components Regression (PCR) | standardizing each predictor, using (6.6). But if the variables are all measured in the same units, then one might choose not to standardize them. | will tend to do well in cases when the first few principal components are sufficient to capture most of the variation in the predictors as well as the relationship with the response. | the directions, which to best represent the predictors, are identified in an *unsupervised way*, since Y is not used to help determine the principal component directions. ==> there is no guarantee that the directions that best explain the predictors will also be the best directions to use for predicting the response.| provides a simple way to perform regression using M < p predictors, it is *not a feature selection method*, because each of the M principal components is a linear combination of all p of the original features. ==> PCR and ridge regression are very closely related. or one can even think of ridge regression as a continuuous version of PCR. |
+| Partial least squares (PLS) | --- | makes use of the response Y in order to identify new features that not only approximate the old features weel, but also that are related to the response. / attempts to find directions that help explain both the response and the predictors. | In practice, it often performs no better than ridge regression or PCR. While the supervised dimension reduction of PLS can reduce bias, it also has the potential to increase variance, so that the overall benefit of PLS relative to PCR is a wash. | <span style="color:orange"> Skipped for now.</span>|
+
+####<span style="color:orange"> Question (page 245) </span>    
+Why the resulting projected observations would have the largest possible variance??
 
 ###6.1 Subset Selection<Page 219>
 ####1. Best Subset Selection
@@ -69,7 +104,7 @@ My ans --- Lab asked to plot the r2, ajstr2, bic, etc. --- But seems something w
 ```{r}
 regfit.full_plot = data.frame("x" = c(1:19), "r2" = reg.summary$rsq, "adjr2" = reg.summary$adjr2, "cp" = reg.summary$cp, "bic" = reg.summary$cp)
 
-plot(regfit.full_plot$x, regfit.full_plot$r2, type = "l", xlab = "predictor number", ylab = "error rate", ylim)
+plot(regfit.full_plot$x, regfit.full_plot$r2, type = "l", xlab = "predictor number", ylab = "error rate")
 
 lines(regfit.full_plot$x, regfit.full_plot$adjr2, type = "l",col = "red")
 
@@ -118,4 +153,5 @@ summary(regfit.bwd)
 
 context: 6.1.3 choose the optimal model --> page 224 Cp, AIC, BIC and xxx
 before page 261. about the Cp, aic, bic, etc, lab should be already talked about them in the Lab 6.5.1 and 6.5.2. 
-####Current skip the rest of the 6.1. and go into the 6.2, page 228
+####Current skip the rest of the 6.1. and go into the 6.2, 
+###now in page 252
