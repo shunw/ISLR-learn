@@ -86,15 +86,35 @@ Why the resulting projected observations would have the largest possible varianc
 
 
 ####(w 6.4.1)High-Dimensional Data:   
-| Method | Method Available | Method Unavailable |
+| Method | Method Unavailable | Method Available |
 | --- | --- | --- |
-| least squares linear regression | no | --- |
+| least squares linear regression | x | --- |
+| logistic regression | x | --- |
+| linear discriminant analysis | x | --- |
+| other classical statistical approaches | x | --- |
+| C<sub>p<\sub> | x | --- |
+| AIC | x | --- |
+| BIC | x | --- |
+| adjusted R<sup>2<\sup> | x | --- |
+| --- | --- | fitting less flexible least squares models |
+| forward stepwise selection | --- | x |
+| ridge regression | --- | x |
+| lasso | --- | x |
+| principal components regression | --- | x |
 
-
+  
+Notice: 
+Adding additional signal features that are *truly associated* with the response will improve the fitted model. However, adding noise features that are not truly associated with the response will lead to a deterioration in the fitted model, and consequently an increased test set error.   
+This is because noise features increase the dimentionality of the problem, exacerbating the risk of overfitting. 
 
 #####High Dimensions Problem: 
-
-
+When the number of features p is as large as, or larger than, the number of observations n, least squares cannot (or rather, should not) be preformed.   
+  
+The reson is: least squares will yield a set of coefficient estimates that result in a perfect fit to that data, such that the residuals are zero.(because the data qty could be used is just one or two)  
+Pefect fit will almost certainly lead to overfitting of the data. The resulting linear model will perform extremely poorly on an independent test set, and therefore does not constitue a useful model.  
+  
+The importance of applying extra care when analyzing data sets with a large number of variables, and of always evaluating model performance on an indepedent test set. 
+  
 ###6.1 Subset Selection<Page 219>
 ####1. Best Subset Selection
 ####from page 219 lab from 258   
@@ -125,17 +145,17 @@ names(reg.summary)
 
 My ans --- Lab asked to plot the r2, ajstr2, bic, etc. --- But seems something wrong. 
 ```{r}
-# regfit.full_plot = data.frame("x" = c(1:19), "r2" = reg.summary$rsq, "adjr2" = reg.summary$adjr2, "cp" = reg.summary$cp, "bic" = reg.summary$cp)
-# 
-# plot(regfit.full_plot$x, regfit.full_plot$r2, type = "l", xlab = "predictor number", ylab = "error rate", ylim)
-# 
-# lines(regfit.full_plot$x, regfit.full_plot$adjr2, type = "l",col = "red")
-# 
-# lines(regfit.full_plot$x, regfit.full_plot$cp, type = "l",col = "blue")
-# 
-# lines(regfit.full_plot$x, regfit.full_plot$bic, type = "l",col = "green")
-# 
-# regfit.full_plot$cp
+regfit.full_plot = data.frame("x" = c(1:19), "r2" = reg.summary$rsq, "adjr2" = reg.summary$adjr2, "cp" = reg.summary$cp, "bic" = reg.summary$cp)
+
+plot(regfit.full_plot$x, regfit.full_plot$r2, type = "l", xlab = "predictor number", ylab = "error rate")
+
+lines(regfit.full_plot$x, regfit.full_plot$adjr2, type = "l",col = "red")
+
+lines(regfit.full_plot$x, regfit.full_plot$cp, type = "l",col = "blue")
+
+lines(regfit.full_plot$x, regfit.full_plot$bic, type = "l",col = "green")
+
+regfit.full_plot$cp
 
 regfit.full_plot = data.frame("x" = c(1:19), "r2" = reg.summary$rsq, "adjr2" = reg.summary$adjr2, "cp" = reg.summary$cp, "bic" = reg.summary$cp)
 
@@ -148,7 +168,7 @@ lines(regfit.full_plot$x, regfit.full_plot$cp, type = "l",col = "blue")
 lines(regfit.full_plot$x, regfit.full_plot$bic, type = "l",col = "green")
 
 regfit.full_plot$cp
->>>>>>> 9695a787014cd5f01d9de3fa229995cce533d253
+
 
 ```
 
