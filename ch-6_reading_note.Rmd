@@ -7,11 +7,13 @@ output: html_document
 
 ##Chapter Purpose: 
 ####Prediction Accuracy: 
+
 1. n >> p (low-dimensional): the LEAST SQUARES estimates tend to also have low variance, and hence will perform well on test observation
 2. n not >> p : a lot of variability in the LEAST SQUARES fit --> overfitting --> poor prediction 
 3. n < p (high-dimentional): the variance is infinite so the LEAST SQUARES cannot be used at all. By constraining or shrinking the estimated coef, we can often substantially reduce the variance at the cost of a negligible increase of bias. (Not sure how to make estimation from this condition. )
 
 ####Model Interpretability: 
+
 | Methods | Select Judgement | Fault | Merit | R_function |
 | --- | --- | --- | --- | --- |
 | Subset | --- | --- | --- | --- |
@@ -24,7 +26,11 @@ output: html_document
 | --- | --- | --- | --- | --- |
 | Dimension Reduction | --- | --- | --- | --- |
 | High-Dimensional Data | --- | --- | --- | --- |
+
 =======
+
+| Methods | Select Judgement | Fault | Merit | R_function |
+| --- | --- | --- | --- | --- |
 | Subset Selection | the most important: low test error. others: CV prediction error, C<sub>p</sub>, BIC, or ajusted R<sup>2</sup> | computational limitations: the number of possible models that must be considered grwos rapidly as *p* increases.It becomes computationally infeasible for values of p greater than 40 | simple and conceptually appealing approach | regsubsets()/ *leaps library*/ use summary() could return R<sup>2</sup>, RSS, adjusted R<sup>2</sup>, C<sub>p</sub>, BIC  |
 | Shrinkage | smallest cross validation error to determine lamda | --- | --- | --- |
 | Dimension Reduction | --- | serves to constrain the estimated beta<sub>j</sub>. this constraint has the potential to bias the coeffient estimates. | use in situations where p is large relative to n, selecting a value of M << p can significantly reduce the variance of the fitted coef | --- |
@@ -258,9 +264,38 @@ summary(regfit.bwd)
 ```
 
 
-**Lab.6.5.3: Forward and Backward Stepwise Selection**
-*purpose:* to practice the forward and backward stepwise  
-*method:* regsubsets(... method = 'forward'/ 'backward') library(leaps)  
+**Lab.6.5.3: Choosing Among Models Using the Validation Set Approach and Cross-Validation**
+*purpose:* to show examples about how to choose the models   
+*data:* Hitters  
+*model:* best subet  
+*set.seed:* (1)  
+*validation method:*
+
+  1. splitting the observations into a training set and a test set. 
+  2. apply the best subset selection on the training set
+  3. use model.matrix() to form the predictions and compute the test MSE. 
+  4. get the best model, which is to use how many predictors.
+  *. Note: no predict() method for regsubsets(). If this would be frequently used, it would be better to make a function. 
+  5. perform best subset selection on the full data set, and select the best n-variable model. (the variable selected here may be different than the variables selected above. )
+  *. Note: it is important that we make use of the full data set in order to obtain more accurate coefficient estimates. 
+
+```{r}
+set.seed(1)
+train = sample(c(TRUE, FALSE), nrow(Hitters), replace = TRUE)
+library(leaps)
+regsubsets(Salary ~ ., data = Hitters[train, ])
+```
+  
+*cross validation method:* 
+
+  0. to perform best subset selection within each of the k training sets. 
+  1. create a vector that allocates each observations to one of k=10 folds, and create a matrix in which we will store the results. 
+  2. write a for loop that performs cross-validation
+  3. In the jth fold, the elements of folds that equal j are in the test set, and the remainder are in the training set. 
+  4. make predictions for each model size, compute the test errors on the appropriate subset, and store them in the appropiate slot in the matrix cv.errors. 
+  5. use apply() function to average over the columns of this matrix in order to obtain a vector for which the jth element is the cross-validation error for the j-variable model. 
+  6. select n-variable model and performan best subset selection on the full data set. 
+
 *result:*  
 
 context: 6.1.3 choose the optimal model --> page 224 Cp, AIC, BIC and xxx
