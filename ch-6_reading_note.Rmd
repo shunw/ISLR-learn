@@ -284,22 +284,46 @@ set.seed(1)
 train = sample(c(TRUE, FALSE), nrow(Hitters), replace = TRUE)
 test = !train
 library(leaps)
+
+# wendy: this step is to apply the best subset and get the coef
 regfit.best = regsubsets(Salary ~ ., data = Hitters[train, ], nvmax = 19)
 
+# wendy: this is to make a matrix, for the test subset, remaining the variable data
 test.mat = model.matrix(Salary ~ ., data = Hitters[test, ])
 
+# wendy: recreate a structure for the test errors
 val.errors = rep(NA, 19)
+
+# wendy: this is to create a matrix with the test errors. 
 for (i in 1:19) {
+  
+  # wendy: this is to get the coef for each predictor, with different predictor number. 
   coefi = coef(regfit.best, id = i)
+  
+  # wendy: this is the multipy the coef with the predictor input, and get the predict Salary
   pred = test.mat[, names(coefi)]%*%coefi
   val.errors[i] = mean((Hitters$Salary[test] - pred) ^ 2)
 }
 
-head(test.mat[, names(coefi)])
 val.errors
 which.min(val.errors)
 coef(regfit.best, 10)
 
+# this function is same as the above steps to get the TEST ERROR
+predict.regsubsets = function(object, newdata, id, ...){
+  form = as.formula(object$call[[2]])
+  mat = model.matrix(form, newdata)
+  coefi = coef(object, id = id)
+  xvars = names(coefi)
+  mat[, xvars] %*% coefi
+}
+
+# wendy: to get the coef from the whole data, with 10 predictors. 
+regfit.best = regsubsets(Salary ~ ., data = Hitters, nvmax = 19)
+coef(regfit.best, 11)
+
+# wendy: this is able to get the same coef as the above, which nvmax is 19
+regfit.best = regsubsets(Salary ~ ., data = Hitters, nvmax = 10)
 ```
   
 *cross validation method:* 
@@ -311,6 +335,41 @@ coef(regfit.best, 10)
   4. make predictions for each model size, compute the test errors on the appropriate subset, and store them in the appropiate slot in the matrix cv.errors. 
   5. use apply() function to average over the columns of this matrix in order to obtain a vector for which the jth element is the cross-validation error for the j-variable model. 
   6. select n-variable model and performan best subset selection on the full data set. 
+
+```{r}
+# need this function for the further use. 
+# this function is same as the above steps to get the TEST ERROR
+predict.regsubsets = function(object, newdata, id, ...){
+  form = as.formula(object$call[[2]])
+  mat = model.matrix(form, newdata)
+  coefi = coef(object, id = id)
+  xvars = names(coefi)
+  mat[, xvars] %*% coefi
+}
+
+k = 10
+set.seed(1)
+folder = sample(1:k, nrow(Hitters), replace = TRUE)
+cv.errors = matrix (NA, k, 19, dimnames = list(NULL, paste(1:19)))
+for (j in 1:k){
+  reg.best = regsubsets(Salary ~ ., data = Hitters[folder != j, ], nvmax = 19)
+  for ( i in 1:19){
+    pred = predict(reg.best, Hitters[folder == j, ], id = i)
+   #print(head(pred, 2))
+    cv.errors[j, i] = mean((Hitters$Salary[folder == j] - pred) ^ 2)
+  }
+}
+  
+mean.cv.error = apply(cv.errors, 2, mean)
+
+mean.cv.error
+
+par(mfrow = c(1, 1))
+plot(mean.cv.error, type = 'b')
+
+reg.best = regsubsets(Salary ~ ., data = Hitters, nvmax = 11)
+coef(reg.best, 11)
+```
 
 *result:*  
 
