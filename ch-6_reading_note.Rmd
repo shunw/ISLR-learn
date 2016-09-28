@@ -32,7 +32,7 @@ output: html_document
 | Methods | Select Judgement | Fault | Merit | R_function |
 | --- | --- | --- | --- | --- |
 | Subset Selection | the most important: low test error. others: CV prediction error, C<sub>p</sub>, BIC, or ajusted R<sup>2</sup> | computational limitations: the number of possible models that must be considered grwos rapidly as *p* increases.It becomes computationally infeasible for values of p greater than 40 | simple and conceptually appealing approach | regsubsets()/ *leaps library*/ use summary() could return R<sup>2</sup>, RSS, adjusted R<sup>2</sup>, C<sub>p</sub>, BIC  |
-| Shrinkage | smallest cross validation error to determine lamda | --- | --- | --- |
+| Shrinkage(Ridge or Lasso) | smallest cross validation error to determine lamda | --- | --- | glmnet()/ *glmnet package* / must pass in an x matrix (could use model.matrix() to create x, and this function will transform any qualitative variables into dummy variables.) as well as a y vector & ensure missing value have been removed & only take numerical values / alpha = 0 -> ridge, alpha = 1 -> lasso |
 | Dimension Reduction | --- | serves to constrain the estimated beta<sub>j</sub>. this constraint has the potential to bias the coeffient estimates. | use in situations where p is large relative to n, selecting a value of M << p can significantly reduce the variance of the fitted coef | --- |
 
 ####(w 6.1)Choose Optimal Model with C<sub>p</sub>, AIC, BIC and Ajusted R<sup>2</sup>: 
@@ -54,7 +54,7 @@ Unlike ridge regression, the lasso performs vairable selection, and hence result
 
 | Item | Explanation | Shrinkage Penalty | Important | Note | Benefit | Disadvantage | Work Best Situation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Ridge Regression (page 229)| similar to least squares, except that the coef are estimated by minimizing a slightly different quantity. <span style="color:orange"> check the 6.5, page 229 </span> | the second term: lambda = 0, penalty term no effect; lambda -> infinite, the penalty increase, and the ridge regression coef estimates will approach zero. | select a good value for lambda | apply ridge regression after standardizing the predictors, because scale equivariant will also impact the value of X<sub>j</sub>Beta<sub>j</sub>/ formula 6.6 page 231 | bias-variance trade-off: lambda increase --> the flexibility of the ridge regression fit decrease --> decrease variance increase bias --> impact the test mean squared error mean // computation advantages over best subset selection | include all p predictors, which is not a problem for prediction accuracy, but create a challenge in model interpretation | the relationship between the response and the predictors is close to linear. least squares estimations have high variance but low bias, like: p > n or p is almost as large as n |
+| Ridge Regression (page 229)| Unlike least squares, which generates only one set of coef, ridge regression will produce a different set of coef estimates Beta<sub>lambda</sub><sup>R</sup> for each lambda / similar to least squares, except that the coef are estimated by minimizing a slightly different quantity. <span style="color:orange"> check the 6.5, page 229 </span> | the second term: lambda = 0, penalty term no effect; lambda -> infinite, the penalty increase, and the ridge regression coef estimates will approach zero. | select a good value for lambda | apply ridge regression after standardizing the predictors, because scale equivariant will also impact the value of X<sub>j</sub>Beta<sub>j</sub>/ formula 6.6 page 231 | bias-variance trade-off: lambda increase --> the flexibility of the ridge regression fit decrease --> decrease variance increase bias --> impact the test mean squared error mean // computation advantages over best subset selection | include all p predictors, which is not a problem for prediction accuracy, but create a challenge in model interpretation | the relationship between the response and the predictors is close to linear. least squares estimations have high variance but low bias, like: p > n or p is almost as large as n |
 | Lasso (page 233) | *Difference from Ridge:* ell 1 penalty has the effect of forcing some of coef estimates to be exactly to zero ==> performs variable selection | same as ridge | --- | --- | --- | overcome Ridge's disadvantage | --- |
 
 ####Another fomulation: 
@@ -371,10 +371,25 @@ reg.best = regsubsets(Salary ~ ., data = Hitters, nvmax = 11)
 coef(reg.best, 11)
 ```
 
-*result:*  
+**Lab.6.6.1: Ridge **
+*purpose:* to show examples about how to choose the models   
+*data:* Hitters  
+*note:* ell 2 related information in the page 230  
 
-context: 6.1.3 choose the optimal model --> page 224 Cp, AIC, BIC and xxx
-before page 261. about the Cp, aic, bic, etc, lab should be already talked about them in the Lab 6.5.1 and 6.5.2. 
-####Current skip the rest of the 6.1. and go into the 6.2, 
-###now in page 252
+```{r}
+# -1 is to remove the Intercept col
+x = model.matrix(Salary ~ ., data = Hitters)[, -1]
+y = Hitters$Salary
+
+library(glmnet)
+grid = 10 ^ seq(10, -2, length = 100)
+ridge.mod = glmnet(x, y, alpha = 0, lambda = grid)
+dim(coef(ridge.mod))
+
+ridge.mod$lambda[50]
+grid[50]
+coef(ridge.mod)[, 50]
+```
+end in page 266
+
 >>>>>>> 9695a787014cd5f01d9de3fa229995cce533d253
