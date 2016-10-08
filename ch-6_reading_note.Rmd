@@ -380,7 +380,7 @@ coef(reg.best, 11)
 # -1 is to remove the Intercept col
 x = model.matrix(Salary ~ ., data = Hitters)[, -1]
 y = Hitters$Salary
-
+# install.packages('glmnet')
 library(glmnet)
 grid = 10 ^ seq(10, -2, length = 100)
 ridge.mod = glmnet(x, y, alpha = 0, lambda = grid)
@@ -389,7 +389,27 @@ dim(coef(ridge.mod))
 ridge.mod$lambda[50]
 grid[50]
 coef(ridge.mod)[, 50]
+
+# get ell 2
+sqrt(sum(coef(ridge.mod)[-1, 50]^2))
+
+predict(ridge.mod, s = 50, type = 'coefficients')[1:20, ]
+
+# to get the test error of ridge regression and the lasso. 
+set.seed(1)
+train = sample(1:nrow(x), nrow(x)/2)
+# this means y just move these data.
+test = (-train)
+y.test = y[test]
+head(y[test], 3)
+head(y[train], 3)
+
+
 ```
-end in page 266
+end in page 267
+part of 
+"> y.test=y[test]"
+
+
 
 >>>>>>> 9695a787014cd5f01d9de3fa229995cce533d253
