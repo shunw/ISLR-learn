@@ -401,15 +401,23 @@ train = sample(1:nrow(x), nrow(x)/2)
 # this means y just move these data.
 test = (-train)
 y.test = y[test]
-head(y[test], 3)
-head(y[train], 3)
 
+ridge.mod = glmnet(x[train, ], y[train], alpha = 0, lambda = grid, thresh = 1e-12)
+ridge.pred = predict(ridge.mod, s = 4, newx = x[test, ])
+mean((ridge.pred - y.test)^2)
 
+ridge.pred = predict(ridge.mod, s = 1e10, newx = x[test, ])
+mean((ridge.pred - y.test) ^ 2)
+
+ridge.pred = predict(ridge.mod, s = 0, newx = x[test, ], exact = T)
+mean((ridge.pred - y.test) ^ 2)
+
+# very similar
+lm(y ~ x, subset = train)
+predict(ridge.mod, s = 0, exact = T, type = 'coefficients') [1:20, ]
 ```
-end in page 267
-part of 
-"> y.test=y[test]"
-
+end in page 268
+in the line of 'In general, if we want to fit a (unpenalized) xxx. '
 
 
 >>>>>>> 9695a787014cd5f01d9de3fa229995cce533d253
