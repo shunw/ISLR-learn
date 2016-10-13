@@ -46,9 +46,23 @@ output: html_document
 
 ####(w 6.2)Shrinkage Methods:   
 A technique such as cross-validation can be used in order to determine which approach (ridge or lasso) is better on a particular data set.   
+
+
 Ridge performs better when the response is a function of many predictors, all with coefficients of roughly equal size.   
+/*Steps:*/ 
+
+1. glmnet(x, y, alpha = 0, lambda = some_value or a_set_of_value): to get the ridge coef based the lambda value 
+  * $lambda ==> get the lambda value
+  * predict(glmnet.mod, s = lambda_value, type = "coefficients"): to get ridge coef with new lambda value based on the same glmnet.mod
+  * predict(glmnet.mod, s = lambda_value, newx = x[test, ]): to get ridge coef with new lambda value based on the same glmnet.mod
+2. cv.glmnet(x, y, alpha = 0): to choose/ get the min lambda by checking with the 10 fold cross validation. 
+
 Lasso performs better in a setting where a relatively small number of predictors have substantial coefficients, and the the remaining predictors have coefficients that are very small or that equal to zero.  
+
+
 As with ridge regression, when the least squares estimates have excessively high variance, the lasso solution can yield a reduction in variance at the expense of a small increase in bias, and consequently can generate more accurate predictions.   
+
+
 Unlike ridge regression, the lasso performs vairable selection, and hence results in models that are easier to interpret. 
 
 
@@ -57,7 +71,7 @@ Unlike ridge regression, the lasso performs vairable selection, and hence result
 | Ridge Regression (page 229)| Unlike least squares, which generates only one set of coef, ridge regression will produce a different set of coef estimates Beta<sub>lambda</sub><sup>R</sup> for each lambda / similar to least squares, except that the coef are estimated by minimizing a slightly different quantity. <span style="color:orange"> check the 6.5, page 229 </span> | the second term: lambda = 0, penalty term no effect; lambda -> infinite, the penalty increase, and the ridge regression coef estimates will approach zero. | select a good value for lambda | apply ridge regression after standardizing the predictors, because scale equivariant will also impact the value of X<sub>j</sub>Beta<sub>j</sub>/ formula 6.6 page 231 | bias-variance trade-off: lambda increase --> the flexibility of the ridge regression fit decrease --> decrease variance increase bias --> impact the test mean squared error mean // computation advantages over best subset selection | include all p predictors, which is not a problem for prediction accuracy, but create a challenge in model interpretation | the relationship between the response and the predictors is close to linear. least squares estimations have high variance but low bias, like: p > n or p is almost as large as n |
 | Lasso (page 233) | *Difference from Ridge:* ell 1 penalty has the effect of forcing some of coef estimates to be exactly to zero ==> performs variable selection | same as ridge | --- | --- | --- | overcome Ridge's disadvantage | --- |
 
-####Another fomulation: 
+####Another formulation: 
 ![Another Formula for Ridge & Lasso](photo_insert/ch-6.2.2_lasso&ridge_6.8&6.9.png)
 ![Equivalent to Best Subset](photo_insert/ch-6.2.2_best subset.png)
 when p = 2,   
@@ -415,9 +429,23 @@ mean((ridge.pred - y.test) ^ 2)
 # very similar
 lm(y ~ x, subset = train)
 predict(ridge.mod, s = 0, exact = T, type = 'coefficients') [1:20, ]
+
+set.seed(1)
+cv.out = cv.glmnet(x[train, ], y[train],alpha = 0)
+plot(cv.out)
+
+bestlam = cv.out$lambda.min
+bestlam
+
+ridge.pred = predict(ridge.mod, s = bestlam, newx = x[test, ])
+mean((ridge.pred-y[test])^2)
+
+out = glmnet(x, y, alpha = 0)
+predict(out, type = 'coefficients', s = bestlam)[1:20, ]
 ```
 end in page 268
 in the line of 'In general, if we want to fit a (unpenalized) xxx. '
+further study: why lambda = grid would impact the final result. 
 
 
 >>>>>>> 9695a787014cd5f01d9de3fa229995cce533d253
