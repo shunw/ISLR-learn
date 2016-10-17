@@ -54,11 +54,11 @@ Ridge performs better when the response is a function of many predictors, all wi
 1. glmnet(x, y, alpha = 0, lambda = some_value or a_set_of_value): to get the ridge coef based the lambda value 
   * $lambda ==> get the lambda value
   * predict(glmnet.mod, s = lambda_value, type = "coefficients"): to get ridge coef with new lambda value based on the same glmnet.mod
-  * predict(glmnet.mod, s = lambda_value, newx = x[test, ]): to get ridge coef with new lambda value based on the same glmnet.mod
-2. cv.glmnet(x, y, alpha = 0): to choose/ get the min lambda by checking with the 10 fold cross validation. 
+  * predict(glmnet.mod, s = lambda_value, newx = x[test, ]): to predict the result based on the glmnet.mod and also the lambda value.
+2. cv.glmnet(x, y, alpha = 0): to choose/ get the suitable lambda by checking with the 10 fold cross validation. The judgement is when cross-validation error is 212. 
 
 Lasso performs better in a setting where a relatively small number of predictors have substantial coefficients, and the the remaining predictors have coefficients that are very small or that equal to zero.  
-
+/*Steps*/: Same as ridge, just change the argument "alpha" to 1
 
 As with ridge regression, when the least squares estimates have excessively high variance, the lasso solution can yield a reduction in variance at the expense of a small increase in bias, and consequently can generate more accurate predictions.   
 
@@ -443,9 +443,45 @@ mean((ridge.pred-y[test])^2)
 out = glmnet(x, y, alpha = 0)
 predict(out, type = 'coefficients', s = bestlam)[1:20, ]
 ```
-end in page 268
-in the line of 'In general, if we want to fit a (unpenalized) xxx. '
-further study: why lambda = grid would impact the final result. 
+
+**Lab.6.6.2: Lasso **
+*purpose:* to show examples about how to choose the models   
+*data:* Hitters  
+*note:* 
+```{r}
+library(glmnet)
+set.seed(1)
+x = model.matrix(Salary ~ ., data = Hitters)[, -1]
+y = Hitters$Salary
+train = sample(1: nrow(x), nrow(x)/2)
+test = (-train)
+
+grid = 10^seq(10, -2, length = 100)
+
+lasso.mod = glmnet(x[train, ], y[train], alpha = 1, lambda = grid)
+plot(lasso.mod)
+
+set.seed(1)
+cv.out = cv.glmnet(x[train, ], y[train], alpha = 1)
+plot(cv.out)
+bestlam = cv.out$lambda.min
+
+lasso.pred = predict(lasso.mod, newx = x[test, ], s = bestlam)
+
+mean((lasso.pred-y[test])^2)
+```
+
+end in page 269
+"This is substantially lower than the test set MSE of the null model and of
+least squares, and very similar to the test MSE of ridge regression with lambda
+chosen by cross-validation."
+
+further study: why "lambda = grid" would impact the final result. 
+
+why the first step is to get the mod, and next is the get the lambda.min, the final is to get the test error. 
+But the test error should not be the final target. The coef should be the final target. 
+
+Question: why in the lm mode, at final end, we need to refit it with all the data. However, in the ridge and lasso, shall we also do this step?
 
 
 >>>>>>> 9695a787014cd5f01d9de3fa229995cce533d253
