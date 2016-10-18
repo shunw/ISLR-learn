@@ -485,7 +485,7 @@ further study: why "lambda = grid" would impact the final result.
 why the first step is to get the mod, and next is the get the lambda.min, the final is to get the test error. 
 But the test error should not be the final target. The coef should be the final target. 
 
-Question: why in the lm mode, at final end, we need to refit it with all the data. However, in the ridge and lasso, shall we also do this step?
+Question: why in the lm mode, at final end, we need to refit it with all the data. However, in the ridge and lasso, shall we also do this step? (for the lasso lab example, it really refit with all the data, still need to check these two methods again. )
 
 
 >>>>>>> 9695a787014cd5f01d9de3fa229995cce533d253
