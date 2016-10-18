@@ -469,6 +469,10 @@ bestlam = cv.out$lambda.min
 lasso.pred = predict(lasso.mod, newx = x[test, ], s = bestlam)
 
 mean((lasso.pred-y[test])^2)
+
+out = glmnet(x, y, alpha = 1, lambda = grid)
+lasso.coef = predict(out, type = "coefficients", s = bestlam)[1:20, ]
+lasso.coef
 ```
 
 end in page 269
