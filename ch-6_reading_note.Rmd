@@ -95,10 +95,10 @@ In general, one can construct up to *p* distinct principal components. The secon
 If the assumption underlying PCR holds, then fitting a least squares model to Z<sub>1</sub>, ..., Z<sub>M</sub> will lead to better results than fitting a least squares model to X<sub>1</sub>, ..., X<sub>p</sub>, since most or all of the information in the data that relates to the response is contained in Z<sub>1</sub>, ..., Z<sub>M</sub>, and by estimating only M << p coefficients we can mitigate overfitting. 
 
 
-| Item | Preparation | Advantage | Disadvantage | Note |
-| --- | --- | --- | --- | --- |
-| Principal Components Regression (PCR) | standardizing each predictor, using (6.6). But if the variables are all measured in the same units, then one might choose not to standardize them. | will tend to do well in cases when the first few principal components are sufficient to capture most of the variation in the predictors as well as the relationship with the response. | the directions, which to best represent the predictors, are identified in an *unsupervised way*, since Y is not used to help determine the principal component directions. ==> there is no guarantee that the directions that best explain the predictors will also be the best directions to use for predicting the response.| provides a simple way to perform regression using M < p predictors, it is *not a feature selection method*, because each of the M principal components is a linear combination of all p of the original features. ==> PCR and ridge regression are very closely related. or one can even think of ridge regression as a continuuous version of PCR. |
-| Partial least squares (PLS) | --- | makes use of the response Y in order to identify new features that not only approximate the old features weel, but also that are related to the response. / attempts to find directions that help explain both the response and the predictors. | In practice, it often performs no better than ridge regression or PCR. While the supervised dimension reduction of PLS can reduce bias, it also has the potential to increase variance, so that the overall benefit of PLS relative to PCR is a wash. | <span style="color:orange"> Skipped for now.</span>|
+| Item | Preparation | Advantage | Disadvantage | Note | Formula |
+| --- | --- | --- | --- | --- | --- |
+| Principal Components Regression (PCR) | standardizing each predictor, using (6.6). But if the variables are all measured in the same units, then one might choose not to standardize them. | will tend to do well in cases when the first few principal components are sufficient to capture most of the variation in the predictors as well as the relationship with the response. | the directions, which to best represent the predictors, are identified in an *unsupervised way*, since Y is not used to help determine the principal component directions. ==> there is no guarantee that the directions that best explain the predictors will also be the best directions to use for predicting the response.| provides a simple way to perform regression using M < p predictors, it is *not a feature selection method*, because each of the M principal components is a linear combination of all p of the original features. ==> PCR and ridge regression are very closely related. or one can even think of ridge regression as a continuuous version of PCR. | pcr(Salary ~ ., data = Hitters, scale = TRUE, validation = "CV") /*pls library*/ scale --> standardizing each predictors; CV --> cross validation by 10 folder; predict(mod, x[test, ], ncomp = 7), ncomp is the number of compnent|
+| Partial least squares (PLS) | --- | makes use of the response Y in order to identify new features that not only approximate the old features weel, but also that are related to the response. / attempts to find directions that help explain both the response and the predictors. | In practice, it often performs no better than ridge regression or PCR. While the supervised dimension reduction of PLS can reduce bias, it also has the potential to increase variance, so that the overall benefit of PLS relative to PCR is a wash. | <span style="color:orange"> Skipped for now.</span>| plsr()/*pls library*/ similar to pcr |
 
 ####<span style="color:orange"> Question (page 245) </span>    
 Why the resulting projected observations would have the largest possible variance??
@@ -475,11 +475,49 @@ lasso.coef = predict(out, type = "coefficients", s = bestlam)[1:20, ]
 lasso.coef
 ```
 
-end in page 269
-"This is substantially lower than the test set MSE of the null model and of
-least squares, and very similar to the test MSE of ridge regression with lambda
-chosen by cross-validation."
 
+**Lab.6.7.1: PCR **
+*purpose:*  
+*data:* Hitters  
+*note:* 
+```{r}
+library(pls)
+set.seed(2)
+pcr.fit = pcr(Salary ~ ., data = Hitters, scale = TRUE, validation = 'CV')
+summary(pcr.fit)
+validationplot(pcr.fit, val.type = "MSEP")
+
+set.seed(1)
+pcr.fit = pcr(Salary ~ ., data = Hitters, subset = train, scale = TRUE, validation = "CV")
+validationplot(pcr.fit, val.type = "MSEP")
+
+pcr.pred = predict(pcr.fit, x[test, ], ncomp = 7)
+mean((pcr.pred - y[test])^2)
+
+pcr.fit = pcr(Salary ~ ., data = Hitters, ncomp = 7, scale = TRUE)
+summary(pcr.fit)
+```
+
+
+**Lab.6.7.1: PLS **
+*purpose:*  
+*data:* Hitters  
+*note:* 
+```{r}
+set.seed(1)
+pls.fit = plsr(Salary ~ ., data = Hitters, subset = train, scale = TRUE, validation = "CV")
+summary(pls.fit)
+
+pls.pre = predict(pls.fit, x[test, ], ncomp = 2)
+mean((pls.pre - y[test])^2)
+pls.fit = plsr(Salary ~ ., data = Hitters, scale = TRUE, ncomp = 2)
+summary(pls.fit)
+```
+
+Further:
+clean all these method and compare them in one place. 
+
+Question: 
 further study: why "lambda = grid" would impact the final result. 
 
 why the first step is to get the mod, and next is the get the lambda.min, the final is to get the test error. 
