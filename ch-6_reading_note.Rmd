@@ -515,10 +515,19 @@ summary(pls.fit)
 ```
 
 ##Summary: 
+Three types of method to get the coef and number of predictors
 
-* Three types of method to get the coef and number of predictors
-* Subset Selection Methods (best subset/ forward/ backward stepwise): 10-fold cv to get the min MSE ---> refit the data w/ all the data ---> get the coef w/ suitable n of predictor
-* 
+* Subset Selection Methods (best subset/ forward/ backward stepwise): 
+    * 10-fold cv to get n of p, whose MSE is min
+    * refit the data w/ all the data 
+    * get the coef w/ suitable n of predictor
+* Shrikage Method
+    * cv.glmnet() to get the lambda, whose MSE is min
+    * refit the data w/ glmnet
+    * get the coef with the predict() with best lambda
+* Dimension Reduction Method
+    * with train data, fit and get the n of predictor which adjcv min
+    * refit the whole data with the n of predictor
 
 
 Further:
@@ -531,6 +540,4 @@ why the first step is to get the mod, and next is the get the lambda.min, the fi
 But the test error should not be the final target. The coef should be the final target. 
 
 Question: why in the lm mode, at final end, we need to refit it with all the data. However, in the ridge and lasso, shall we also do this step? (for the lasso lab example, it really refit with all the data, still need to check these two methods again. )
-
-
 >>>>>>> 9695a787014cd5f01d9de3fa229995cce533d253
