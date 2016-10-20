@@ -1,0 +1,31 @@
+---
+title: "ch-7_reading_note"
+author: "wendy"
+date: "10/20/2016"
+output: html_document
+---
+####Purpose: 
+Fit non-linear model
+####Data: 
+Wage in library(ISLR)
+
+| No. | Regression | relation/ merit | Suggestion |
+| --- | --- | --- | --- |
+| 1 | Polynomial regression (Page 280) | --- | unusual to use d greater than 3 or 4 because of overly flexible |
+| 2 | Step functions (Page 282) | --- |
+| 3 | Regression splines | extension of item 1 and item 2, => flexible than them |
+| 4 | Smoothing splines | similar to item 3 |
+| 5 | Local regression | similar to item 3 and item, one important difference, regions are allowed to overlap |
+| 6 | Generalized additive models | allow us to extend the methods all above to deal w/ multiple predictors |
+
+####Lab 
+**Lab.7.8.1: Polynomial & Step Function (Page 302) **
+*purpose:*    
+*data:*   
+*note:* 
+```{r}
+library(ISLR)
+head(Wage)
+```
+
+stop in page 284, complete the basis functions
