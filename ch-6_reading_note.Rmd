@@ -514,6 +514,13 @@ pls.fit = plsr(Salary ~ ., data = Hitters, scale = TRUE, ncomp = 2)
 summary(pls.fit)
 ```
 
+##Summary: 
+
+* Three types of method to get the coef and number of predictors
+* Subset Selection Methods (best subset/ forward/ backward stepwise): 10-fold cv to get the min MSE ---> refit the data w/ all the data ---> get the coef w/ suitable n of predictor
+* 
+
+
 Further:
 clean all these method and compare them in one place. 
 
