@@ -27,6 +27,7 @@ Wage in library(ISLR)
 
 * w/ raw = T or not, will impact the predict result, or not? for the first fit, it won't, but what about others? 
     * the result of the prediction is exact the same. 
+    * also in the page 303, the last code also indicate the same thing. 
     
     
 
@@ -56,7 +57,15 @@ agelims = range(Wage$age)
 age.grid = seq(from = agelims[1], to = agelims[2])
 preds = predict(fit, newdata = list(age=age.grid), se=TRUE)
 
+se.bands = cbind(preds$fit + 2*preds$se.fit, preds$fit - 2*preds$se.fit)
+
+par(mfrow = c(1, 2), mar=c(4.5, 4.5, 1, 1), oma = c(0, 0, 4, 0))
+plot(Wage$age, Wage$wage, xlim = agelims, cex = .5, col = "darkgrey")
+title("Degree-4 Polynomial", outer = T)
+lines(age.grid, preds$fit, lwd = 2, col = "blue")
+matlines(age.grid, se.bands, lwd = 1, col = "blue", lty = 3)
+
 ```
 
 stop in page 284, complete the basis functions
-stop in the page 302 and 303, about the poly(age, 4, raw = T)
+stop in the page 304 about how to determine the degree of the poly
