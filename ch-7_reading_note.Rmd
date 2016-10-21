@@ -26,6 +26,14 @@ Wage in library(ISLR)
 ```{r}
 library(ISLR)
 head(Wage)
+fit = lm(wage ~ poly(age, 4), data = Wage)
+coef(summary(fit))
+plot(Wage$age, Wage$wage)
+lines(fit)
+
+fit2 = lm(wage ~ poly(age, 4, raw = T), data = Wage)
+coef(summary(fit2))
 ```
 
 stop in page 284, complete the basis functions
+stop in the page 302 and 303, about the poly(age, 4, raw = T)
