@@ -19,20 +19,43 @@ Wage in library(ISLR)
 | 6 | Generalized additive models | allow us to extend the methods all above to deal w/ multiple predictors |
 
 ####Lab 
-**Lab.7.8.1: Polynomial & Step Function (Page 302) **
-*purpose:*    
+**Lab.7.8.1: Polynomial & Step Function (Page 302) *7.8.1 Polynomial Regression and Step Functions*
+*purpose:* produce the Figure 7.1    
 *data:*   
 *note:* 
+*try-out:* 
+
+* w/ raw = T or not, will impact the predict result, or not? for the first fit, it won't, but what about others? 
+    * the result of the prediction is exact the same. 
+    
+    
+
 ```{r}
 library(ISLR)
-head(Wage)
 fit = lm(wage ~ poly(age, 4), data = Wage)
 coef(summary(fit))
-plot(Wage$age, Wage$wage)
-lines(fit)
 
 fit2 = lm(wage ~ poly(age, 4, raw = T), data = Wage)
 coef(summary(fit2))
+
+#wendy try to verify if fit == fit2
+train = sample(1:nrow(Wage), nrow(Wage)/2)
+test = -(train)
+fit = lm(wage ~ poly(age, 4), data = Wage[train,])
+fit1 = lm(wage ~ poly(age, 4, raw = T), data = Wage[train, ])
+fit.pre = predict(fit, Wage[test, ])
+fit1.pre = predict(fit1, Wage[test, ])
+head(fit.pre)
+head(fit1.pre)
+
+mean((fit.pre - Wage[test, ]$wage)^2)
+mean((fit1.pre - Wage[test, ]$wage)^2)
+# try end
+
+agelims = range(Wage$age)
+age.grid = seq(from = agelims[1], to = agelims[2])
+preds = predict(fit, newdata = list(age=age.grid), se=TRUE)
+
 ```
 
 stop in page 284, complete the basis functions
