@@ -28,6 +28,13 @@ Wage in library(ISLR)
 * w/ raw = T or not, will impact the predict result, or not? for the first fit, it won't, but what about others? 
     * the result of the prediction is exact the same. 
     * also in the page 303, the last code also indicate the same thing. 
+* How to get the degree of poly
+    * anova (fit.1, fit.2, fit.3, ... ) / Page 304
+    * coef(summary(fit.3)) / Page 304 / same as the anova result. Pr @ anova = Pr @ summary & Sum of Sq @ anova = t value ^ 2 @ summary
+    * if there is only one predictor, the above two are same; but if there are some predictor added into the fit, anova will be more direct to get the result. 
+    * Note: fit.1 must be the subset of the predictors in fit.2....
+    * Try: why not cross validation? 
+        * 2-folder CV's result is: poly 4 and poly 5 are better, which is different than the anova. 
     
     
 
@@ -65,7 +72,49 @@ title("Degree-4 Polynomial", outer = T)
 lines(age.grid, preds$fit, lwd = 2, col = "blue")
 matlines(age.grid, se.bands, lwd = 1, col = "blue", lty = 3)
 
-```
+# get the degree of poly by anova, and summary...
+fit.1 = lm(wage ~ age, data = Wage)
+fit.2 = lm(wage ~ poly(age, 2), data = Wage)
+fit.3 = lm(wage ~ poly(age, 3), data = Wage)
+fit.4 = lm(wage ~ poly(age, 4), data = Wage)
+fit.5 = lm(wage ~ poly(age, 5), data = Wage)
+anova(fit.1, fit.2, fit.3, fit.4, fit.5)
+
+coef(summary(fit.5))
+
+fit.1 = lm(wage ~ education + age, data = Wage)
+fit.2 = lm(wage ~ education + poly(age, 2), data = Wage)
+fit.3 = lm(wage ~ education + poly(age, 3), data = Wage)
+anova(fit.1, fit.2, fit.3)
+coef(summary(fit.3))
+
+# wendy try the CV to get the degree of poly 
+# 2-folder of CV's result is poly 4, and 5 is bettern. 
+set.seed(1)
+train = sample(1:nrow(Wage), nrow(Wage)/2)
+test = -(train)
+fit.1 = lm(wage ~ age, data = Wage[train,])
+fit.2 = lm(wage ~ poly(age, 2), data = Wage[train,])
+fit.3= lm(wage ~ poly(age, 3), data = Wage[train,])
+fit.4 = lm(wage ~ poly(age, 4), data = Wage[train,])
+fit.5 = lm(wage ~ poly(age, 5), data = Wage[train,])
+
+pre.1 = predict(fit.1, newdata = Wage[test, -12])
+pre.2 = predict(fit.2, newdata = Wage[test, -12])
+pre.3 = predict(fit.3, newdata = Wage[test, -12])
+pre.4 = predict(fit.4, newdata = Wage[test, -12])
+pre.5 = predict(fit.5, newdata = Wage[test, -12])
+
+test.err.1 = mean((pre.1 - Wage[test, 12])^2)
+test.err.2 = mean((pre.2 - Wage[test, 12])^2)
+test.err.3 = mean((pre.3 - Wage[test, 12])^2)
+test.err.4 = mean((pre.4 - Wage[test, 12])^2)
+test.err.5 = mean((pre.5 - Wage[test, 12])^2)
+c(test.err.1, test.err.2, test.err.3, test.err.4, test.err.5)
+# try end
+
+``` 
 
 stop in page 284, complete the basis functions
-stop in the page 304 about how to determine the degree of the poly
+stop in the page 305 "As an alternative to using hypothesis tests and ANOVA, ..."
+still think about the 10-folder cv to verify if the degree of poly will be same as anova result. 
