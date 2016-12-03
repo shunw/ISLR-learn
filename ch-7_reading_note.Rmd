@@ -14,9 +14,9 @@ Wage in library(ISLR)
 | 1 | Polynomial regression (Page 280) | --- | unusual to use d greater than 3 or 4 because of overly flexible | --- |
 | 2 | Step functions (Page 282) | --- | "suggestion" | cut() to get the x, lm() to get the fit |
 | 3 | Regression splines | extension of item 1 and item 2, => flexible than them | Number and Location of knots:  more knots where the function might vary most rapidly, and fewer knots in the place where stable; To decide how many knots need to use CV| bs() - default is poly(x, 3): generates the entire matrix of basis function for splines w/ the specified set of knots, eg. lm(y ~ bs(x, knots = c(25, 40, 60)), data = Wage) / attr(bs(Wage$age, df = 6), "knots") this is to get the recommendation on the knots location/ ns() for the natural spline, eg lm(wage~ns(age, df = 4),data = Wage), as for the degree of the ns please refer to the page 289, note 4 (bottom of the page)|
-| 4 | Smoothing splines | similar to item 3 | want to make RSS (function 7.11 left part) to be to be small and also smooth. / g"(t) is a measure of its roughness/ integral(g"(t)^2dt) is a measure of the total change in the the function g'(t) ---> g smooth >> g'(t) close to constant >> integral(g"(t)^2dt) small value; vice verse ---> lager lambda >> smoother g/ lambda controls the bias-variance trade-off of the smoothing spline/ lambda controls the roughness of the smoothing spline and the effective degrees of freedom./ Use LOOCV to choose lambda | smooth.spline(age, wage, cv = True) |
-| 5 | Local regression | similar to item 3 and item, one important difference, regions are allowed to overlap | compute the fit at a target point x0 using only nearby training observation/ the most important is to choose span s, which control the flexibility of the non-linear fit. The method is CV/ perform poorly if p is much larger than about 3 or 4, due to very few training observations close to x0 | "function" |
-| 6 | Generalized additive models | allow us to extend the methods all above to deal w/ multiple predictors |"suggestion" | "function" |
+| 4 | Smoothing splines | similar to item 3 | want to make RSS (function 7.11 left part) to be to be small and also smooth. / g''(t) is a measure of its roughness/ integral(g''(t)^2dt) is a measure of the total change in the the function g'(t). That is if g smooth, g'(t) would close to constant, then integral(g''(t)^2dt) small value; vice verse, for lager lambda,  there will be smoother g/ lambda controls the bias-variance trade-off of the smoothing spline/ lambda controls the roughness of the smoothing spline and the effective degrees of freedom./ Use LOOCV to choose lambda |smooth.spline(age, wage, cv = True)|
+| 5 | Local regression | similar to item 3 and item, one important difference, regions are allowed to overlap | compute the fit at a target point x0 using only nearby training observation/ the most important is to choose span s, which control the flexibility of the non-linear fit. The method is CV/ perform poorly if p is much larger than about 3 or 4, due to very few training observations close to x0 | loess(wage ~ age, span = .2, data = Wage)/ predict(fit, data.frame(age = age.grid))  |
+| 6 | Generalized additive models | allow us to extend the methods all above to deal w/ multiple predictors / can be applied "quantitative" and "qualitative" / merit 1: fit a non-linear f<sub>j</sub> to each X<sub>j</sub> ==> not need to try different transformations on each variable individually; merit 2: potentially make more accurate predictions for reponse Y; merit 3: able to examine the effect of each X<sub>j</sub> on Y individually while holding all of the other variables fixed ==> useful representation for inference; merit 4: the smoothness of the function f<sub>j</sub> for the variable X<sub>j</sub> can be summized via degrees of freedom. disadvantage: important interactions can be missed. However, we can manually add interaction terms to the GAM model by including additional predictors of the form X<sub>j</sub> x X<sub>k</sub> |"suggestion" | lm(wage ~ ns(year, 4) + ns(age, 5) + education, data = Wage); library(gam) -> gam(wage ~ s(year, 4) + s (age, 5) + education, data = Wage) [s is smooth.spline]; lo() local regression, and could be used in the gam() function just as ns() / predict(fit, newdata = Wage) // logistic regression GAM: gam(I(wage> 250) ~ year + s(age, df = 5) + education, family = binomial, data = Wage|
 
 Function:   
 ![7.11_SmoothSplines](photo_insert/ch-7.5.1_smooth_spline.png)
@@ -202,8 +202,51 @@ lines(fit2, col = "blue", lwd = 2)
 legend("topright", legend = c("16 DF", "6.8 DF"), col = c("red", "blue"), lty = 1, lwd = 2, cex = .8)
 
 # local regression page 308
+plot(Wage$age, Wage$wage, xlim = agelims, cex = .5, col = "darkgrey")
+title("Local Regression")
+fit = loess(wage ~ age, span = .2, data = Wage)
+fit2 = loess(wage ~ age, span = .5, data = Wage)
+lines(age.grid, predict(fit, data.frame(age = age.grid)), col = "red", lwd = 2)
+lines(age.grid, predict(fit2, data.frame(age = age.grid)), col = "blue", lwd = 3)
+legend("topright", legend = c("Span = .2", "Span = .5"), col = c("red", "blue"), lty = 1, lwd = 2, cex = .8)
 ```
 
+**Lab.7.8.3: GAM (Page 308)*
+*purpose:*   
+*data:*   
+*note:* 
+*try-out:* 
+```{r}
+gam1 = lm(wage ~ ns(year, 4) + ns(age, 5) + education, data = Wage)
+library(gam)
+gam.m3 = gam(wage ~ s(year, 4) + s(age, 5) + education, data = Wage)
+par(mfrow = c(1, 3))
+plot(gam.m3, se = TRUE, col = "blue")
+plot.gam(gam1, se = TRUE, col = "red")
+
+gam.m1 = gam(wage ~ s(age, 5) + education, data = Wage)
+gam.m2 = gam(wage ~ year + s(age, 5) + education, data = Wage)
+anova(gam.m1, gam.m2, gam.m3, test = "F")
+
+summary(gam.m3)
+
+preds = predict(gam.m2, newdata = Wage)
+
+gam.lo = gam(wage ~ s(year, df =4) + lo(age, span = .7) + education, data = Wage)
+plot.gam(gam.lo, se = TRUE, col = "green")
+
+gam.lo.i = gam(wage ~ lo(year, age, span = .5) + education, data = Wage)
+library(akima)
+plot(gam.lo.i)
+
+gam.lr = gam(I(wage>250) ~ year + s(age, df = 5) + education, family = binomial, data = Wage)
+par(mfrow = c(1, 3))
+plot(gam.lr, se = T, col = "green")
+
+table(Wage$education, I(Wage$wage > 250))
+gam.lr.s = gam(I(wage > 250) ~ year + s(age, df = 5) + education, family = binomial, data = Wage, subset = (education != "1. < HS Grad"))
+plot(gam.lr.s, se = T, col = "green")
+``` 
 stop in page 296, complete the local regression
 lab stop in the page 307, local regression spline()
 
