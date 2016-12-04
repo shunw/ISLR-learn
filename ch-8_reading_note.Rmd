@@ -37,12 +37,20 @@ Carseats
 ####Lab:
 Page 337
 
+**Lab.8.3.1: Fitting Classification Trees*
+*purpose:* fit classification trees    
+*data:*   
+*note:* 
+*try-out:* 
 ```{r}
 library(ISLR)
-par(mfrow = c(1,1))
-hist(Hitters$Salary)
-hist(log(Hitters$Salary))
-
+library(tree)
+High = ifelse(Carseats$Sales <= 8, "No", "Yes")
+Carseats = data.frame(Carseats, High)
+tree.carseats = tree(High ~ .-Sales, Carseats)
+summary(tree.carseats)
+plot(tree.carseats)
+text(tree.carseats, pretty = 0)
 ```
 
 Context stopped in page 325
