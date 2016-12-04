@@ -1,0 +1,49 @@
+---
+title: "ch-8_reading_note"
+author: "wendy"
+date: "12/3/2016"
+output: html_document
+---
+####Purpose: 
+Decision Tree (Page 317)  
+Bagging
+Random Forests
+Boosting
+
+####Data: 
+Hitters
+Carseats
+
+| No. | Regression | relation/ merit | Flaws | Suggestion | Function Related |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Decision Tree (Regression Trees) | easier to interpret and have nice graphical representation | Easy to overfit; a smaller tree with fewer splits may lead to lower variance and better interpretation at the cost of a little bias. | top-down, greedy approach (which is known as recursive binary splitting, and at each step of the tree building process, the best split is made as that particular step) / every steps' cutpoint needs to lead to the greatest pssible reduction in RSS. / To make smaller tree, one good way is to build a very large tree, and then prune it back. The method is to select a subtree that leads to the lowest test error rate by cost complexity pruning (weakest link pruning) function 8.4 / use CV to get the alpha, then retrun to the full data set and obtain the subtree corresponding to this alpha like algorithm 8.1| no lab, need to figure it out by myself |
+| 2 | Decision Tree (classification trees) | same as above | same as above, just use classification error rate to replace the RSS; however, classification error is not sufficiently sensitive for tree-growing, in practice two other measures are preferable, as function 8.6 and 8.7. When building a classification tree, either the Gini index or the cross-entropy are used to evaluate the quality of a particular split. Classification error rate is preferalbe to prune the tree if prediction accuracy of the final pruned tree is the goal. | --- | --- |
+
+####Function/ Algorithm: 
+
+* Function 8.4: alpha is to control a trade-off between the subtree's complexity and its fit to the training data. / T is the number of terminal nodes of the tree T. 
+![8.4_cost_complexity_pruning](photo_insert/ch-8.4_cost_comp_pruning.png)
+
+* Algorithm 8.1
+![ch-algorithm_8.1_build_tree](photo_insert/ch-algorithm_8.1_build_tree.png)
+
+* Function 8.6: Gini index will take a small value if all the p<sub>mk</sub> are close to zero or one. This could be used to check the node purity. 
+![ch-8.6_Gini_index](photo_insert/ch-8.6_Gini_index.png)
+
+
+* Function 8.7: Cross Entropy will take on  a value near zero if all the p<sub>mk</sub> are all near one or zero. This also could be used to check the node purity.
+![ch-8.7_cross_entropy](photo_insert/ch-8.7_cross_entropy.png)
+
+####Lab:
+Page 337
+
+```{r}
+library(ISLR)
+par(mfrow = c(1,1))
+hist(Hitters$Salary)
+hist(log(Hitters$Salary))
+
+```
+
+Context stopped in page 325
+Lab: there is no lab for the regression tree. Need to figure it out in future. 
