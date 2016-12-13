@@ -1,0 +1,18 @@
+---
+title: "ch-0_readingnote.Rmd"
+author: "wendy"
+date: "12/13/2016"
+output: html_document
+---
+
+| No of Chapter | Purpose | --- |
+| --- | --- | --- |
+| #2 | basic terminology and concept / K-nearest neighbor classifier | --- |
+| #3 | linear regression (fundamental starting point for all regression methods) | --- |
+| #4 | classification methods: logistic regression and linear discriminant analysis | --- |
+| #5 | cross-validaion / bootstrap | --- |
+| #6 | linear methods | --- |
+| #7 | non-linear methods | --- |
+| #8 | tree-based methods | --- |
+| #9 | support vector machines | --- |
+| #10 | unsupervised method: PCA/ clustering | --- |
